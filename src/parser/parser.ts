@@ -99,6 +99,26 @@ export function parseSQL(sql: string, userDialect?: SQLDialect): ParseResult {
       });
     }
 
+    if (/ORDER\s+BY\s+RAND(OM)?\s*\(\s*\)/i.test(trimmed)) {
+      diagnostics.push({
+        id: 'order-by-rand',
+        message: 'ORDER BY RAND() forces a full table scan and temporary table allocation.',
+        severity: 'warning',
+        ruleId: 'no-random-sort',
+        suggestion: 'Avoid sorting by random() on large tables',
+      });
+    }
+
+    if (/\bSELECT\s+DISTINCT\b/i.test(trimmed) && model.groupBy) {
+      diagnostics.push({
+        id: 'redundant-distinct-group-by',
+        message: 'Redundant DISTINCT with GROUP BY detected. GROUP BY already produces unique groups.',
+        severity: 'info',
+        ruleId: 'redundant-distinct',
+        suggestion: 'Remove DISTINCT when using GROUP BY',
+      });
+    }
+
     return {
       model,
       ast: singleAst,

@@ -67,6 +67,15 @@ const FlowInner: React.FC<QueryFlowCanvasProps> = ({ model, onSelectNode, theme 
     return () => clearTimeout(timeout);
   }, [model, setNodes, setEdges, fitView]);
 
+  // Center on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      fitView({ padding: 0.2, duration: 200 });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [fitView]);
+
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
       <ReactFlow

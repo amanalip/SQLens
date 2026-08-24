@@ -44,6 +44,20 @@ describe('SQL Diagnostics Engine', () => {
     expect(wildcardDiag?.severity).toBe('info');
   });
 
+  it('detects ORDER BY RAND() and warns about full table scans', () => {
+    const res = parseSQL('SELECT id, name FROM users ORDER BY RANDOM() LIMIT 5;');
+    const randDiag = res.diagnostics.find((d) => d.id === 'order-by-rand');
+    expect(randDiag).toBeDefined();
+    expect(randDiag?.severity).toBe('warning');
+  });
+
+  it('detects redundant DISTINCT with GROUP BY clause', () => {
+    const res = parseSQL('SELECT DISTINCT department, COUNT(*) FROM employees GROUP BY department;');
+    const distinctDiag = res.diagnostics.find((d) => d.id === 'redundant-distinct-group-by');
+    expect(distinctDiag).toBeDefined();
+    expect(distinctDiag?.severity).toBe('info');
+  });
+
   it('generates error diagnostic with line and column numbers on syntax failure', () => {
     const res = parseSQL('SELECT FROM WHERE;');
     const errDiag = res.diagnostics.find((d) => d.severity === 'error');

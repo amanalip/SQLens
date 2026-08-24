@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Share2,
   Download,
@@ -42,6 +42,17 @@ export const TopNav: React.FC<TopNavProps> = ({
   const [showHelp, setShowHelp] = useState(false);
 
   const activeDb = bundledDatabases.find((db) => db.id === selectedDbId) || bundledDatabases[0];
+
+  useEffect(() => {
+    if (!showHelp) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setShowHelp(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showHelp]);
 
   const handleShareClick = () => {
     onShare();
