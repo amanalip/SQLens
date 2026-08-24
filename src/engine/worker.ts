@@ -22,9 +22,10 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
 
   try {
     if (type === 'INIT') {
+      const wasmUrl = (payload as { wasmUrl?: string })?.wasmUrl;
       if (!SQL) {
         SQL = await initSqlJs({
-          locateFile: (file) => `./${file}`,
+          locateFile: (file) => wasmUrl || `./${file}`,
         });
       }
       if (!db) {

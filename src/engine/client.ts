@@ -33,13 +33,30 @@ class SqlEngineClient {
       console.error('Worker error:', error);
     };
 
-    await this.sendRequest('INIT');
+    const baseUrl = import.meta.env.BASE_URL || './';
+    const wasmUrl = new URL(`${baseUrl}sql-wasm.wasm`, window.location.href).href;
+
+    await this.sendRequest('INIT', { wasmUrl });
     this.isInitialized = true;
   }
 
   public async loadDatabase(dbPath: string): Promise<void> {
     await this.init();
-    await this.sendRequest('LOAD_DB', dbPath);
+    try {
+      const baseUrl = import.meta.env.BASE_URL || './';
+      const cleanPath = dbPath.replace(/^\.\//, '');
+      const fullUrl = new URL(`${baseUrl}${cleanPath}`, window.location.href).href;
+
+      const response = await fetch(fullUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to load database: ${response.statusText}`);
+      }
+      const buffer = await response.arrayBuffer();
+      await this.sendRequest('LOAD_BUFFER', buffer);
+    } catch {
+      // Fallback: try loading directly via path
+      await this.sendRequest('LOAD_DB', dbPath);
+    }
   }
 
   public async loadDatabaseBuffer(buffer: ArrayBuffer): Promise<void> {

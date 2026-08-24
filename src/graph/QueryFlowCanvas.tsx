@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import { useMemo, useEffect } from 'react';
 import {
   ReactFlow,
   Background,
@@ -9,6 +9,7 @@ import {
   Node,
   BackgroundVariant,
   useReactFlow,
+  ReactFlowProvider,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -111,5 +112,9 @@ const FlowInner: React.FC<QueryFlowCanvasProps> = ({ model, onSelectNode, theme 
 };
 
 export const QueryFlowCanvas: React.FC<QueryFlowCanvasProps> = (props) => {
-  return <FlowInner {...props} />;
+  return (
+    <ReactFlowProvider>
+      <FlowInner {...props} />
+    </ReactFlowProvider>
+  );
 };

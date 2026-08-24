@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect } from 'react';
+import { useMemo, useEffect } from 'react';
 import {
   ReactFlow,
   Background,
@@ -9,6 +9,7 @@ import {
   Node,
   BackgroundVariant,
   useReactFlow,
+  ReactFlowProvider,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 
@@ -103,5 +104,9 @@ const SchemaFlowInner: React.FC<SchemaFlowCanvasProps> = ({
 };
 
 export const SchemaFlowCanvas: React.FC<SchemaFlowCanvasProps> = (props) => {
-  return <SchemaFlowInner {...props} />;
+  return (
+    <ReactFlowProvider>
+      <SchemaFlowInner {...props} />
+    </ReactFlowProvider>
+  );
 };
