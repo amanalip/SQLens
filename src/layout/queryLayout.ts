@@ -26,7 +26,11 @@ export function buildQueryGraph(model: QueryModel): LayoutResult {
         data: {
           name: cte.name,
           model: cte.model,
-          summary: `${cte.model.sources.map((s) => s.name).join(', ')} -> (${cte.name})`,
+          summary: `${
+            cte.model?.sources?.length
+              ? cte.model.sources.map((s) => s.name).join(', ')
+              : 'VALUES'
+          } -> (${cte.name})`,
         },
       });
       cteYOffset += 140;

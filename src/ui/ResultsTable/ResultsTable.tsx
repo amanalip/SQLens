@@ -193,11 +193,21 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
         </div>
 
         <div className={styles.actionsGroup}>
-          <button className={styles.csvButton} onClick={handleCopyCsv} title="Copy results as CSV to clipboard">
+          <button
+            className={styles.csvButton}
+            onClick={handleCopyCsv}
+            title="Copy results as CSV to clipboard"
+            aria-label="Copy results as CSV to clipboard"
+          >
             {copied ? <Check size={12} color="#10b981" /> : <Copy size={12} />}
             <span>{copied ? 'Copied' : 'Copy CSV'}</span>
           </button>
-          <button className={styles.csvButton} onClick={handleDownloadCsv} title="Download results as a CSV file">
+          <button
+            className={styles.csvButton}
+            onClick={handleDownloadCsv}
+            title="Download results as a CSV file"
+            aria-label="Download results as a CSV file"
+          >
             <Download size={12} />
             <span>Download CSV</span>
           </button>
@@ -252,6 +262,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
           <select
             value={table.getState().pagination.pageSize}
             onChange={(e) => table.setPageSize(Number(e.target.value))}
+            aria-label="Rows per page"
             style={{
               background: 'var(--bg-secondary, #161d27)',
               color: 'var(--text-secondary, #9ca3af)',
@@ -278,6 +289,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
               title="First page"
+              aria-label="First page"
             >
               <ChevronsLeft size={13} />
             </button>
@@ -286,6 +298,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
               title="Previous page"
+              aria-label="Previous page"
             >
               <ChevronLeft size={13} />
             </button>
@@ -294,6 +307,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
               title="Next page"
+              aria-label="Next page"
             >
               <ChevronRight size={13} />
             </button>
@@ -302,6 +316,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
               disabled={!table.getCanNextPage()}
               title="Last page"
+              aria-label="Last page"
             >
               <ChevronsRight size={13} />
             </button>
