@@ -15,6 +15,7 @@ export const CTESubgraphNode: React.FC<NodeProps> = ({ data, selected }) => {
 
   return (
     <div className={`${styles.nodeCard} ${selected ? styles.selected : ''}`}>
+      <Handle type="target" position={Position.Left} style={{ background: '#6366f1' }} />
       <div className={styles.nodeHeader} style={{ borderLeft: '3px solid var(--node-cte, #6366f1)' }}>
         <div className={styles.headerIcon} style={{ background: 'rgba(99, 102, 241, 0.15)', color: '#6366f1' }}>
           <Box size={13} />

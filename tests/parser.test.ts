@@ -85,4 +85,27 @@ describe('SQL Parser & Analyzer', () => {
     expect(result.model.sources.length).toBe(1);
     expect(result.model.sources[0].name).toBe('users');
   });
+
+  it('parses multiple chained CTEs', () => {
+    const sql = `
+      WITH cte1 AS (
+        SELECT id, user_id FROM orders
+      ),
+      cte2 AS (
+        SELECT id FROM cte1 WHERE user_id > 10
+      )
+      SELECT * FROM cte2;
+    `;
+    const result = parseSQL(sql);
+    expect(result.model.ctes.length).toBe(2);
+    expect(result.model.ctes[0].name).toBe('cte1');
+    expect(result.model.ctes[1].name).toBe('cte2');
+  });
+
+  it('parses JOIN with USING clause correctly', () => {
+    const sql = 'SELECT * FROM orders JOIN customers USING (customer_id);';
+    const result = parseSQL(sql);
+    expect(result.model.joins.length).toBe(1);
+    expect(result.model.joins[0].usingColumns).toContain('customer_id');
+  });
 });

@@ -33,12 +33,12 @@ export const JoinNode: React.FC<NodeProps> = ({ data, selected }) => {
         {joinData.onCondition && (
           <div className={styles.codeSnippet}>ON {joinData.onCondition}</div>
         )}
-        {joinData.usingColumns && (
+        {joinData.usingColumns && joinData.usingColumns.length > 0 && (
           <div className={styles.codeSnippet}>
             USING ({joinData.usingColumns.join(', ')})
           </div>
         )}
-        {!joinData.onCondition && !joinData.usingColumns && (
+        {!joinData.onCondition && (!joinData.usingColumns || joinData.usingColumns.length === 0) && (
           <div className={styles.nodeSubtext} style={{ color: '#f59e0b' }}>
             Cartesian product (no ON condition)
           </div>

@@ -220,7 +220,16 @@ export function analyzeAst(ast: unknown, rawSql: string): QueryModel {
       else if (rawJoinType.includes('NATURAL')) joinType = 'NATURAL';
 
       const onCondition = item.on ? exprToString(item.on) : undefined;
-      const usingCols = Array.isArray(item.using) ? item.using.map(String) : undefined;
+      const usingCols = Array.isArray(item.using)
+        ? item.using.map((u) => {
+            if (typeof u === 'string') return u;
+            if (u && typeof u === 'object') {
+              const uObj = u as Record<string, unknown>;
+              return String(uObj.column || uObj.value || exprToString(u));
+            }
+            return String(u);
+          })
+        : undefined;
 
       if (!onCondition && !usingCols && joinType !== 'CROSS' && joinType !== 'NATURAL') {
         hasCartesianJoin = true;

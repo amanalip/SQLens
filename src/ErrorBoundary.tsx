@@ -61,21 +61,42 @@ export class ErrorBoundary extends Component<Props, State> {
           >
             {this.state.error?.message || 'An unexpected error occurred.'}
           </pre>
-          <button
-            onClick={() => window.location.reload()}
-            style={{
-              background: '#3b82f6',
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: 4,
-              padding: '8px 16px',
-              fontSize: 13,
-              fontWeight: 600,
-              cursor: 'pointer',
-            }}
-          >
-            Reload Application
-          </button>
+          <div style={{ display: 'flex', gap: 10 }}>
+            <button
+              onClick={() => window.location.reload()}
+              style={{
+                background: '#3b82f6',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: 4,
+                padding: '8px 16px',
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: 'pointer',
+              }}
+            >
+              Reload Application
+            </button>
+            <button
+              onClick={() => {
+                window.location.hash = '';
+                localStorage.removeItem('sqlens_theme');
+                window.location.reload();
+              }}
+              style={{
+                background: 'transparent',
+                color: '#9ca3af',
+                border: '1px solid #2a3649',
+                borderRadius: 4,
+                padding: '8px 16px',
+                fontSize: 13,
+                fontWeight: 500,
+                cursor: 'pointer',
+              }}
+            >
+              Reset Session
+            </button>
+          </div>
         </div>
       );
     }
