@@ -1,5 +1,9 @@
 # SQLens
 
+<p align="center">
+  <img src="public/sqlens-logo.svg" alt="SQLens Detective Logo" width="140" height="140" />
+</p>
+
 ```text
        ,----.
      .´  __  `.

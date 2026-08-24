@@ -4,7 +4,6 @@ import {
   Download,
   Moon,
   Sun,
-  Eye,
   Layers,
   Check,
   Code2,
@@ -52,7 +51,11 @@ export const TopNav: React.FC<TopNavProps> = ({
     <header className={styles.nav}>
       <div className={styles.brandGroup}>
         <div className={styles.logo}>
-          <Eye size={18} color="#3b82f6" />
+          <img
+            src={`${import.meta.env.BASE_URL || './'}sqlens-logo.svg`}
+            alt="SQLens Detective Logo"
+            style={{ width: 26, height: 26 }}
+          />
           <span>SQLens</span>
         </div>
         <span className={styles.tagline}>Clarity for every query</span>
