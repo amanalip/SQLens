@@ -189,6 +189,9 @@ export const TopNav: React.FC<TopNavProps> = ({
           onClick={() => setShowHelp(false)}
         >
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Keyboard Shortcuts and Help Guide"
             style={{
               background: 'var(--bg-secondary, #161d27)',
               border: '1px solid var(--border, #2a3649)',
@@ -204,6 +207,8 @@ export const TopNav: React.FC<TopNavProps> = ({
               <div style={{ fontWeight: 600, fontSize: 15 }}>Keyboard Shortcuts & Tips</div>
               <button
                 onClick={() => setShowHelp(false)}
+                aria-label="Close help modal"
+                title="Close help modal"
                 style={{ background: 'transparent', border: 'none', color: 'var(--text-muted, #6b7280)', cursor: 'pointer', fontSize: 16 }}
               >
                 ×

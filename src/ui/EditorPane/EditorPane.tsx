@@ -323,6 +323,7 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
             <button
               className={styles.toolButton}
               onClick={handleFormat}
+              aria-label="Format SQL query"
               title="Format query keywords and clause structure"
             >
               <Sparkles size={13} />
@@ -332,6 +333,7 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
             <button
               className={styles.toolButton}
               onClick={handleClear}
+              aria-label="Clear SQL editor"
               title="Clear editor query"
             >
               <RotateCcw size={13} />
@@ -341,6 +343,7 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
             <button
               className={styles.toolButton}
               onClick={() => fileInputRef.current?.click()}
+              aria-label="Open SQL file"
               title="Upload .sql file"
             >
               <Upload size={13} />
@@ -358,6 +361,7 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
               className={styles.runButton}
               onClick={() => onRunQueryRef.current()}
               disabled={isExecuting}
+              aria-label="Execute SQL query"
               title="Execute query (Ctrl+Enter)"
             >
               <Play size={13} fill="#ffffff" />

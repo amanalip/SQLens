@@ -51,7 +51,8 @@ export const ForeignKeyEdge: React.FC<EdgeProps> = ({
               fontSize: 10,
               fontFamily: 'monospace',
               color: 'var(--text-secondary, #9ca3af)',
-              pointerEvents: 'all',
+              pointerEvents: 'none',
+              userSelect: 'none',
               zIndex: 10,
             }}
           >

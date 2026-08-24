@@ -36,6 +36,9 @@ export const TableNode: React.FC<NodeProps> = ({ data, selected }) => {
         {tableData.schema && (
           <div className={styles.nodeSubtext}>Schema: {tableData.schema}</div>
         )}
+        {!tableData.alias && !tableData.schema && (
+          <div className={styles.nodeSubtext}>Source table</div>
+        )}
       </div>
       <Handle type="source" position={Position.Right} style={{ background: '#3b82f6' }} />
     </div>

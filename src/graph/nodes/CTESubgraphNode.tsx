@@ -30,7 +30,10 @@ export const CTESubgraphNode: React.FC<NodeProps> = ({ data, selected }) => {
       </div>
       <div className={styles.nodeBody}>
         <div>Sub-pipeline:</div>
-        <div className={styles.codeSnippet}>{cteData.summary}</div>
+        <div className={styles.codeSnippet}>
+          {cteData.summary ||
+            `SELECT from ${cteData.model?.sources?.map((s) => s.name).join(', ') || 'sources'}`}
+        </div>
       </div>
       <Handle type="source" position={Position.Right} style={{ background: '#6366f1' }} />
     </div>
