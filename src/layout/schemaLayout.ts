@@ -15,18 +15,21 @@ export function buildSchemaGraph(schema: SchemaModel): SchemaLayoutResult {
     return { nodes, edges };
   }
 
-  // Grid layout calculation
+  // Dynamic masonry column layout calculation
   const COLUMNS_COUNT = Math.min(4, Math.max(2, Math.ceil(Math.sqrt(tableNames.length))));
-  const X_SPACING = 360;
-  const Y_SPACING = 340;
+  const X_SPACING = 380;
+
+  // Track max Y offset per column to prevent vertical card overlap
+  const columnYOffsets = new Array(COLUMNS_COUNT).fill(50);
 
   tableNames.forEach((tableName, index) => {
     const table = schema.tables[tableName];
     const colIndex = index % COLUMNS_COUNT;
-    const rowIndex = Math.floor(index / COLUMNS_COUNT);
-
     const x = 50 + colIndex * X_SPACING;
-    const y = 50 + rowIndex * Y_SPACING;
+    const y = columnYOffsets[colIndex];
+
+    const cardHeight = Math.max(200, 60 + (table.columns?.length || 0) * 26 + 30);
+    columnYOffsets[colIndex] += cardHeight;
 
     nodes.push({
       id: `table_${tableName}`,

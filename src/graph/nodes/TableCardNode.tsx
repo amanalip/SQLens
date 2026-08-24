@@ -49,6 +49,11 @@ export const TableCardNode: React.FC<NodeProps> = ({ data, selected }) => {
               <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                 {col.isPrimaryKey && <span className={styles.pkBadge}>PK</span>}
                 {col.isForeignKey && <span className={styles.fkBadge}>FK</span>}
+                {col.isUnique && !col.isPrimaryKey && (
+                  <span className={styles.pkBadge} style={{ background: 'rgba(6, 182, 212, 0.2)', color: '#06b6d4' }}>
+                    UQ
+                  </span>
+                )}
                 <span className={styles.columnType}>{col.type}</span>
               </div>
 

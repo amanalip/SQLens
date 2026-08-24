@@ -37,7 +37,17 @@ export function decodeStateFromHash(hash: string): AppUrlState | null {
 
     if (!decompressed) return null;
 
-    return JSON.parse(decompressed) as AppUrlState;
+    const parsed = JSON.parse(decompressed) as Partial<AppUrlState>;
+    if (!parsed || typeof parsed !== 'object') return null;
+    if (typeof parsed.sql !== 'string' && typeof parsed.dbId !== 'string' && typeof parsed.mode !== 'string') {
+      return null;
+    }
+
+    return {
+      sql: typeof parsed.sql === 'string' ? parsed.sql : '',
+      dbId: typeof parsed.dbId === 'string' ? parsed.dbId : undefined,
+      mode: parsed.mode === 'schema' ? 'schema' : 'query',
+    };
   } catch (err) {
     console.error('Failed to decode URL state:', err);
     return null;

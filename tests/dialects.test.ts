@@ -12,11 +12,12 @@ describe('SQL Dialect Detector', () => {
   it('detects MySQL specific constructs', () => {
     expect(detectDialect('SELECT `id`, `name` FROM `users` STRAIGHT_JOIN `orders`;')).toBe('mysql');
     expect(detectDialect('SELECT IFNULL(a, b) FROM data;')).toBe('mysql');
-    expect(detectDialect('SELECT group_concat(name) FROM users;')).toBe('mysql');
+    expect(detectDialect('CREATE TABLE users (id INT AUTO_INCREMENT PRIMARY KEY);')).toBe('mysql');
   });
 
-  it('defaults to SQLite for standard SQL queries', () => {
+  it('defaults to SQLite for standard SQL queries and SQLite group_concat', () => {
     expect(detectDialect('SELECT id, name FROM users WHERE id = 1;')).toBe('sqlite');
     expect(detectDialect('SELECT a.id, b.title FROM artists a INNER JOIN albums b ON a.id = b.artist_id;')).toBe('sqlite');
+    expect(detectDialect('SELECT group_concat(name) FROM users;')).toBe('sqlite');
   });
 });

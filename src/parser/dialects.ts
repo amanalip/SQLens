@@ -21,7 +21,6 @@ export function detectDialect(sql: string): SQLDialect {
     normalized.includes('`') ||
     normalized.includes('straight_join') ||
     normalized.includes('ifnull(') ||
-    normalized.includes('group_concat(') ||
     normalized.includes('show tables') ||
     normalized.includes('show databases')
   ) {
