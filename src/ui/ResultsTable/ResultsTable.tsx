@@ -12,6 +12,7 @@ import {
   Clock,
   Rows,
   Copy,
+  Download,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -197,7 +198,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
             <span>{copied ? 'Copied' : 'Copy CSV'}</span>
           </button>
           <button className={styles.csvButton} onClick={handleDownloadCsv} title="Download results as a CSV file">
-            <Copy size={12} />
+            <Download size={12} />
             <span>Download CSV</span>
           </button>
         </div>

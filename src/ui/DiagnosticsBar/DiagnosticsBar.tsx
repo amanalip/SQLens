@@ -34,16 +34,24 @@ export const DiagnosticsBar: React.FC<DiagnosticsBarProps> = ({
           ? styles.warning
           : styles.info;
 
+        const hasLine = typeof d.line === 'number' && d.line > 0;
         return (
           <div
             key={`${d.id}_${index}`}
             className={`${styles.item} ${itemClass}`}
             onClick={() => {
-              if (typeof d.line === 'number' && onJumpToLine) {
-                onJumpToLine(Math.max(1, d.line), d.column);
+              if (hasLine && onJumpToLine) {
+                onJumpToLine(Math.max(1, d.line!), d.column);
               }
             }}
-            title={d.suggestion || 'Click to jump to line in editor'}
+            style={{ cursor: hasLine ? 'pointer' : 'default' }}
+            title={
+              d.suggestion
+                ? `${d.suggestion}${hasLine ? ' (Click to jump to line)' : ''}`
+                : hasLine
+                ? 'Click to jump to line in editor'
+                : undefined
+            }
           >
             {isError ? (
               <AlertCircle size={12} />
@@ -52,9 +60,7 @@ export const DiagnosticsBar: React.FC<DiagnosticsBarProps> = ({
             ) : (
               <Info size={12} />
             )}
-            {typeof d.line === 'number' && d.line > 0 && (
-              <span className={styles.badge}>Line {d.line}</span>
-            )}
+            {hasLine && <span className={styles.badge}>Line {d.line}</span>}
             <span className={styles.message}>{d.message}</span>
           </div>
         );

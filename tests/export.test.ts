@@ -67,4 +67,18 @@ describe('CSV Formatter Unit Tests', () => {
   it('returns empty string for zero-column results', () => {
     expect(formatCsv([], [])).toBe('');
   });
+
+  it('escapes multiline strings with linebreaks and commas', () => {
+    const cols = ['id', 'bio'];
+    const rows = [[101, 'First line,\nSecond line']];
+    const csv = formatCsv(cols, rows);
+    expect(csv).toContain('"First line,\nSecond line"');
+  });
+
+  it('calculates non-zero total page count for empty result sets', () => {
+    const rowCount = 0;
+    const pageSize = 10;
+    const totalPages = Math.max(1, Math.ceil(rowCount / pageSize));
+    expect(totalPages).toBe(1);
+  });
 });

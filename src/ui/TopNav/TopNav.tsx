@@ -60,12 +60,18 @@ export const TopNav: React.FC<TopNavProps> = ({
     setTimeout(() => setCopiedShare(false), 2000);
   };
 
+  const baseUrl = import.meta.env.BASE_URL
+    ? import.meta.env.BASE_URL.endsWith('/')
+      ? import.meta.env.BASE_URL
+      : `${import.meta.env.BASE_URL}/`
+    : './';
+
   return (
     <header className={styles.nav}>
       <div className={styles.brandGroup}>
         <div className={styles.logo}>
           <img
-            src={`${import.meta.env.BASE_URL || './'}sqlens-logo.svg`}
+            src={`${baseUrl}sqlens-logo.svg`}
             alt="SQLens Detective Logo"
             style={{ width: 26, height: 26 }}
           />

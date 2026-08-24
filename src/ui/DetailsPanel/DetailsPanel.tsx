@@ -40,6 +40,8 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
           </div>
           <button
             onClick={onClose}
+            aria-label="Close inspector panel"
+            title="Close inspector panel"
             style={{ background: 'transparent', border: 'none', color: 'var(--text-muted, #6b7280)', cursor: 'pointer' }}
           >
             <X size={14} />
@@ -125,6 +127,8 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
         </div>
         <button
           onClick={onClose}
+          aria-label="Close inspector panel"
+          title="Close inspector panel"
           style={{ background: 'transparent', border: 'none', color: 'var(--text-muted, #6b7280)', cursor: 'pointer' }}
         >
           <X size={14} />
