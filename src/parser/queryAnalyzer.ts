@@ -96,7 +96,11 @@ export function exprToString(expr: unknown): string {
     return String(node.value);
   }
 
-  return JSON.stringify(expr);
+  try {
+    return JSON.stringify(expr);
+  } catch {
+    return String(expr);
+  }
 }
 
 // Extract all column references from an expression
@@ -220,7 +224,7 @@ export function analyzeAst(ast: unknown, rawSql: string): QueryModel {
       else if (rawJoinType.includes('NATURAL')) joinType = 'NATURAL';
 
       const onCondition = item.on ? exprToString(item.on) : undefined;
-      const usingCols = Array.isArray(item.using)
+      const usingCols = Array.isArray(item.using) && item.using.length > 0
         ? item.using.map((u) => {
             if (typeof u === 'string') return u;
             if (u && typeof u === 'object') {
@@ -346,14 +350,26 @@ export function analyzeAst(ast: unknown, rawSql: string): QueryModel {
   if (node.limit) {
     const limitObj = node.limit as Record<string, unknown>;
     if (Array.isArray(limitObj.value)) {
-      const limitVal = limitObj.value[0]?.value ?? limitObj.value[0];
-      const offsetVal = limitObj.value[1]?.value ?? limitObj.value[1];
-      limit = {
-        count: Number(limitVal) || 0,
-        offset: offsetVal !== undefined ? Number(offsetVal) : undefined,
-      };
+      const sep = String(limitObj.seperator || limitObj.separator || '').toLowerCase();
+      const first = Number(limitObj.value[0]?.value ?? limitObj.value[0]);
+      const second = limitObj.value[1] !== undefined ? Number(limitObj.value[1]?.value ?? limitObj.value[1]) : undefined;
+
+      if (sep === ',' && second !== undefined) {
+        // MySQL LIMIT offset, count
+        limit = {
+          count: !isNaN(second) ? second : 0,
+          offset: !isNaN(first) ? first : undefined,
+        };
+      } else {
+        // Standard LIMIT count OFFSET offset
+        limit = {
+          count: !isNaN(first) ? first : 0,
+          offset: second !== undefined && !isNaN(second) ? second : undefined,
+        };
+      }
     } else if (limitObj.value !== undefined) {
-      limit = { count: Number(limitObj.value) || 0 };
+      const val = Number(limitObj.value);
+      limit = { count: !isNaN(val) ? val : 0 };
     }
   }
 

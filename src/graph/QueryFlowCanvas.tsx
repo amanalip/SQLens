@@ -108,6 +108,16 @@ const FlowInner: React.FC<QueryFlowCanvasProps> = ({ model, onSelectNode, theme 
         <Controls showInteractive={false} />
         <MiniMap
           nodeStrokeWidth={3}
+          nodeColor={(n) => {
+            if (n.type === 'tableNode' || n.type === 'tableCardNode') return '#3b82f6';
+            if (n.type === 'joinNode') return '#8b5cf6';
+            if (n.type === 'filterNode') return '#f59e0b';
+            if (n.type === 'aggregateNode') return '#06b6d4';
+            if (n.type === 'sortLimitNode') return '#ec4899';
+            if (n.type === 'outputNode') return '#10b981';
+            if (n.type === 'cteNode') return '#a855f7';
+            return '#64748b';
+          }}
           style={{
             background: theme === 'dark' ? '#161d27' : '#ffffff',
             border: `1px solid ${theme === 'dark' ? '#2a3649' : '#e2e8f0'}`,

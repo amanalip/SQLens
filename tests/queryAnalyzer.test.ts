@@ -86,4 +86,12 @@ describe('Query Analyzer AST Extraction', () => {
     expect(res.model.projections.length).toBe(2);
     expect(res.model.limit?.count).toBe(10);
   });
+
+  it('correctly parses MySQL comma limit syntax (LIMIT offset, count)', () => {
+    const sql = 'SELECT id, title FROM books LIMIT 10, 20;';
+    const res = parseSQL(sql);
+    expect(res.model.limit).toBeDefined();
+    expect(res.model.limit?.count).toBe(20);
+    expect(res.model.limit?.offset).toBe(10);
+  });
 });

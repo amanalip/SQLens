@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parseSQL } from '../src/parser/parser';
+import { exprToString } from '../src/parser/queryAnalyzer';
 
 describe('SQL Parser & Analyzer', () => {
   it('parses simple SELECT statement', () => {
@@ -107,5 +108,11 @@ describe('SQL Parser & Analyzer', () => {
     const result = parseSQL(sql);
     expect(result.model.joins.length).toBe(1);
     expect(result.model.joins[0].usingColumns).toContain('customer_id');
+  });
+
+  it('safely stringifies circular AST nodes without throwing', () => {
+    const circularObj: Record<string, unknown> = { type: 'custom_unknown' };
+    circularObj.self = circularObj;
+    expect(() => exprToString(circularObj)).not.toThrow();
   });
 });

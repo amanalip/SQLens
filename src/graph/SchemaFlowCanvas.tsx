@@ -170,6 +170,10 @@ const SchemaFlowInner: React.FC<SchemaFlowCanvasProps> = ({
         <Controls showInteractive={false} />
         <MiniMap
           nodeStrokeWidth={3}
+          nodeColor={(n) => {
+            if ((n.data as { isOrphan?: boolean })?.isOrphan) return '#f59e0b';
+            return '#3b82f6';
+          }}
           style={{
             background: theme === 'dark' ? '#161d27' : '#ffffff',
             border: `1px solid ${theme === 'dark' ? '#2a3649' : '#e2e8f0'}`,
