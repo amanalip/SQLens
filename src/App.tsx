@@ -21,11 +21,15 @@ export function App() {
     return (localStorage.getItem('sqlens_theme') as Theme) || 'dark';
   });
 
-  const [mode, setMode] = useState<'query' | 'schema'>('query');
-  const [selectedDbId, setSelectedDbId] = useState<string>('chinook');
-  const [sqlQuery, setSqlQuery] = useState<string>(
-    bundledDatabases[0].samples[0]?.sql || 'SELECT 1;'
-  );
+  const initialHashState = useMemo(() => {
+    return decodeStateFromHash(window.location.hash);
+  }, []);
+
+  const [mode, setMode] = useState<'query' | 'schema'>(() => initialHashState?.mode || 'query');
+  const [selectedDbId, setSelectedDbId] = useState<string>(() => initialHashState?.dbId || 'chinook');
+  const [sqlQuery, setSqlQuery] = useState<string>(() => {
+    return initialHashState?.sql || bundledDatabases[0].samples[0]?.sql || 'SELECT 1;';
+  });
 
   const [schema, setSchema] = useState<SchemaModel | null>(null);
   const [queryResult, setQueryResult] = useState<QueryExecutionResult | null>(null);
@@ -40,6 +44,17 @@ export function App() {
 
   const editorRef = useRef<EditorPaneRef>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  // Global Escape key listener to close details drawer
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedNode(null);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Apply theme tokens to CSS root variables
   useEffect(() => {
@@ -111,28 +126,11 @@ export function App() {
     }
   }, [sqlQuery]);
 
-  // Initialize from URL hash or default database
+  // Initialize initial database
   useEffect(() => {
-    const hash = window.location.hash;
-    const initialUrlState = decodeStateFromHash(hash);
-
-    if (initialUrlState) {
-      if (initialUrlState.dbId) {
-        setSelectedDbId(initialUrlState.dbId);
-        loadDatabase(initialUrlState.dbId);
-      } else {
-        loadDatabase('chinook');
-      }
-      if (initialUrlState.sql) {
-        setSqlQuery(initialUrlState.sql);
-      }
-      if (initialUrlState.mode) {
-        setMode(initialUrlState.mode);
-      }
-    } else {
-      loadDatabase('chinook');
-    }
-  }, [loadDatabase]);
+    const targetDb = initialHashState?.dbId || 'chinook';
+    loadDatabase(targetDb);
+  }, [loadDatabase, initialHashState]);
 
   // Auto-run query once when database finishes loading
   useEffect(() => {

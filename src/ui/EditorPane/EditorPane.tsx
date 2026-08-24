@@ -12,7 +12,7 @@ import { sql, SQLite } from '@codemirror/lang-sql';
 import { autocompletion, closeBrackets } from '@codemirror/autocomplete';
 import { setDiagnostics, Diagnostic } from '@codemirror/lint';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { Play, Upload, Sparkles } from 'lucide-react';
+import { Play, Upload, Sparkles, RotateCcw } from 'lucide-react';
 import { DiagnosticWarning } from '../../model/diagnostics';
 import { SchemaModel } from '../../model/schema';
 import styles from './EditorPane.module.css';
@@ -40,6 +40,12 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
     const schemaCompartment = useRef(new Compartment());
     const themeCompartment = useRef(new Compartment());
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const onRunQueryRef = useRef(onRunQuery);
+    onRunQueryRef.current = onRunQuery;
+
+    const onChangeRef = useRef(onChange);
+    onChangeRef.current = onChange;
 
     useImperativeHandle(ref, () => ({
       jumpToLine: (line: number, column = 1) => {
@@ -91,7 +97,7 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
         {
           key: 'Mod-Enter',
           run: () => {
-            onRunQuery();
+            onRunQueryRef.current();
             return true;
           },
         },
@@ -100,7 +106,7 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
       const updateListener = EditorView.updateListener.of((update) => {
         if (update.docChanged) {
           const docString = update.state.doc.toString();
-          onChange(docString);
+          onChangeRef.current(docString);
         }
       });
 
@@ -266,10 +272,24 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
 
       formatted = formatted.trim();
 
+      const cursor = view.state.selection.main.head;
+
       view.dispatch({
         changes: { from: 0, to: view.state.doc.length, insert: formatted },
+        selection: { anchor: Math.min(cursor, formatted.length) },
       });
-      onChange(formatted);
+      onChangeRef.current(formatted);
+    };
+
+    // Clear editor content
+    const handleClear = () => {
+      const view = editorViewRef.current;
+      if (!view) return;
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: '' },
+      });
+      onChangeRef.current('');
+      view.focus();
     };
 
     // File upload handler
@@ -287,7 +307,7 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
               changes: { from: 0, to: view.state.doc.length, insert: text },
             });
           }
-          onChange(text);
+          onChangeRef.current(text);
         }
       };
       reader.readAsText(file);
@@ -302,10 +322,19 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
             <button
               className={styles.toolButton}
               onClick={handleFormat}
-              title="Format query keywords"
+              title="Format query keywords and clause structure"
             >
               <Sparkles size={13} />
               <span>Format</span>
+            </button>
+
+            <button
+              className={styles.toolButton}
+              onClick={handleClear}
+              title="Clear editor query"
+            >
+              <RotateCcw size={13} />
+              <span>Clear</span>
             </button>
 
             <button
@@ -326,7 +355,7 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
 
             <button
               className={styles.runButton}
-              onClick={onRunQuery}
+              onClick={() => onRunQueryRef.current()}
               disabled={isExecuting}
               title="Execute query (Ctrl+Enter)"
             >

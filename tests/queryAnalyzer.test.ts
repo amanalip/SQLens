@@ -62,6 +62,23 @@ describe('Query Analyzer AST Extraction', () => {
     expect(res.model.limit?.offset).toBe(50);
   });
 
+  it('handles subqueries in FROM clause', () => {
+    const sql = `
+      SELECT sub.category_id, sub.item_count
+      FROM (
+        SELECT category_id, COUNT(*) AS item_count
+        FROM products
+        GROUP BY category_id
+      ) AS sub
+      WHERE sub.item_count > 10;
+    `;
+    const res = parseSQL(sql);
+    expect(res.model.subqueries.length).toBe(1);
+    expect(res.model.subqueries[0].alias).toBe('sub');
+    expect(res.model.sources[0].alias).toBe('sub');
+    expect(res.model.filters.length).toBe(1);
+  });
+
   it('handles fallback parser for unparseable or complex queries', () => {
     const sql = 'SELECT id, username FROM users WHERE status = 1 ORDER BY id DESC LIMIT 10';
     const res = parseSQL(sql);
