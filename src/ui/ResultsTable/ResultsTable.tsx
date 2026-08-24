@@ -18,6 +18,8 @@ import {
   ChevronsLeft,
   ChevronsRight,
   ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
   AlertCircle,
 } from 'lucide-react';
 import { QueryExecutionResult } from '../../engine/worker';
@@ -198,7 +200,13 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
                   >
                     <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
                       <span>{flexRender(header.column.columnDef.header, header.getContext())}</span>
-                      <ArrowUpDown size={11} color="var(--text-muted, #6b7280)" />
+                      {header.column.getIsSorted() === 'asc' ? (
+                        <ArrowUp size={11} color="var(--accent, #3b82f6)" />
+                      ) : header.column.getIsSorted() === 'desc' ? (
+                        <ArrowDown size={11} color="var(--accent, #3b82f6)" />
+                      ) : (
+                        <ArrowUpDown size={11} color="var(--text-muted, #6b7280)" />
+                      )}
                     </div>
                   </th>
                 ))}

@@ -57,7 +57,44 @@
 
 ---
 
-## 7. Zero-Column Query Feedback in Results Table
+## 7. SQLite Foreign Key Null Target Column Resolution
+
+- **Issue**: When a SQLite foreign key referenced a table's primary key without an explicit column name, `PRAGMA foreign_key_list` returned null for the target column, resulting in the literal string `"null"` and broken edge connections.
+- **Fix**: Added fallback to default primary key column name (`'id'`) when `fkRow[4]` is null or empty.
+- **Files Modified**:
+  - `src/engine/worker.ts`
+
+---
+
+## 8. Web Worker SQLite Index Extraction & Missing FK Index Warnings
+
+- **Issue**: `GET_SCHEMA` in `src/engine/worker.ts` never queried `PRAGMA index_list` or `PRAGMA index_info`, leaving table indexes empty and missing index diagnostics unpopulated.
+- **Fix**: Extracted real indexes via `PRAGMA index_list` and `PRAGMA index_info` per table and computed missing index warnings for foreign key columns.
+- **Files Modified**:
+  - `src/engine/worker.ts`
+
+---
+
+## 9. CTE Flow Edges in Query Graph
+
+- **Issue**: CTE nodes were rendered on the canvas but had no outgoing edges connecting them to the downstream table source nodes referencing that CTE.
+- **Fix**: Added directed flow edges from CTE nodes to matching source table nodes in `src/layout/queryLayout.ts`.
+- **Files Modified**:
+  - `src/layout/queryLayout.ts`
+  - `tests/queryLayout.test.ts`
+
+---
+
+## 10. CTE Node Inspector in DetailsPanel
+
+- **Issue**: Clicking on a CTE node in the query flow graph showed an empty inspector state.
+- **Fix**: Added dedicated CTE node inspection displaying the CTE name, source tables, projections, and AST details.
+- **Files Modified**:
+  - `src/ui/DetailsPanel/DetailsPanel.tsx`
+
+---
+
+## 11. Zero-Column Query Feedback in Results Table
 
 - **Issue**: When a query returned zero columns (e.g. DDL / DML commands), `ResultsTable.tsx` displayed the placeholder message "Execute query (Ctrl+Enter) to view results table".
 - **Fix**: Added a success state that displays execution time and zero row feedback for non-result queries.
@@ -69,13 +106,15 @@
 ## UI/UX Enhancements Added
 
 1. **Interactive Table Filter in Schema Explorer**: Added real-time table search input to `SchemaFlowCanvas.tsx` to highlight matching tables and dim non-matching tables.
-2. **Enhanced CSV Export & Page Size Controls**: Added a "Download CSV" file export button alongside "Copy CSV", plus a page size selector (10, 25, 50, 100 rows per page) in `ResultsTable.tsx`.
-3. **Dedicated Sort & Limit Inspector**: Added full inspection for `ORDER BY` directions and `LIMIT / OFFSET` numbers in `DetailsPanel.tsx`.
-4. **Interactive SQL Formatter**: Added a format toolbar button in `EditorPane.tsx` to standardize SQL casing and clause breaks.
+2. **Download CSV & Page Size Controls**: Added a "Download CSV" file export button alongside "Copy CSV", plus a page size selector (10, 25, 50, 100 rows per page) in `ResultsTable.tsx`.
+3. **Active Sort Direction Indicators**: Added clear ascending (`ArrowUp`), descending (`ArrowDown`), and unsorted (`ArrowUpDown`) icons to results table headers.
+4. **Keyboard Shortcuts & Help Dialog**: Added a Help modal in `TopNav.tsx` detailing key shortcuts (`Ctrl+Enter` to run, `Ctrl+Space` for autocomplete, node click inspection).
+5. **Dedicated Sort & Limit Inspector**: Added full inspection for `ORDER BY` directions and `LIMIT / OFFSET` numbers in `DetailsPanel.tsx`.
+6. **Interactive SQL Formatter**: Added a format toolbar button in `EditorPane.tsx` to standardize SQL casing and clause breaks.
 
 ---
 
-## Expanded Test Coverage (8 Test Suites, 32 Tests)
+## Expanded Test Coverage (8 Test Suites, 34 Tests)
 
 - `tests/schemaLayout.test.ts`: Graph layout, distinct handle IDs, orphan tables.
 - `tests/diagnostics.test.ts`: Diagnostics for unbounded mutations, Cartesian joins, star projections, leading wildcard searches, syntax errors.
@@ -84,4 +123,4 @@
 - `tests/schemaParser.test.ts`: Multi-word data types, composite primary keys, foreign keys, missing indexes.
 - `tests/urlState.test.ts`: Codec encoding, hash prefixes, corruption handling.
 - `tests/parser.test.ts`: Query parsing and AST models.
-- `tests/queryLayout.test.ts`: Query flow DAG layout and node generation.
+- `tests/queryLayout.test.ts`: Query flow DAG layout, CTE connections, dual table support.

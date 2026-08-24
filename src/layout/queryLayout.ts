@@ -51,6 +51,24 @@ export function buildQueryGraph(model: QueryModel): LayoutResult {
         schema: source.schema,
       },
     });
+
+    // If source references a CTE, connect the CTE node to this source node
+    if (model.ctes && model.ctes.length > 0) {
+      model.ctes.forEach((cte, cteIdx) => {
+        const cteNameLower = cte.name.toLowerCase();
+        const srcNameLower = source.name.toLowerCase();
+        if (srcNameLower === cteNameLower) {
+          edges.push({
+            id: `edge_cte_${cteIdx}_${nodeId}`,
+            source: `cte_${cteIdx}`,
+            target: nodeId,
+            type: 'flowEdge',
+            animated: true,
+            markerEnd: { type: MarkerType.ArrowClosed },
+          });
+        }
+      });
+    }
   });
 
   if (model.sources.length === 0) {

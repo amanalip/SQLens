@@ -104,7 +104,8 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
           {type === 'aggregateNode' && <Layers size={14} color="#ec4899" />}
           {type === 'sortLimitNode' && <ArrowDownUp size={14} color="#06b6d4" />}
           {type === 'outputNode' && <CheckCircle size={14} color="#10b981" />}
-          <span>Node Details</span>
+          {type === 'cteNode' && <Layers size={14} color="#a855f7" />}
+          <span>{type === 'cteNode' ? `CTE: ${data.name || ''}` : 'Node Details'}</span>
         </div>
         <button
           onClick={onClose}
@@ -115,6 +116,32 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
       </div>
 
       <div className={styles.content}>
+        {type === 'cteNode' && (
+          <>
+            <div className={styles.section}>
+              <div className={styles.sectionTitle}>Common Table Expression (WITH)</div>
+              <div className={styles.propertyRow}>
+                <span className={styles.propertyLabel}>CTE Name:</span>
+                <span className={styles.propertyValue}>{String(data.name)}</span>
+              </div>
+              {Boolean(data.summary) && (
+                <div className={styles.propertyRow}>
+                  <span className={styles.propertyLabel}>Data Flow:</span>
+                  <span className={styles.propertyValue}>{String(data.summary)}</span>
+                </div>
+              )}
+            </div>
+            {data.model && (
+              <div className={styles.section}>
+                <div className={styles.sectionTitle}>CTE Projections</div>
+                <div className={styles.codeBlock}>
+                  {(data.model as { projections?: Array<{ raw: string }> }).projections?.map((p) => p.raw).join('\n') || '*'}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
         {type === 'tableNode' && (
           <>
             <div className={styles.section}>

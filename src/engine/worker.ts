@@ -165,7 +165,10 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
             for (const fkRow of fkResult[0].values) {
               const toTable = String(fkRow[2]);
               const fromCol = String(fkRow[3]);
-              const toCol = String(fkRow[4]);
+              const toCol =
+                fkRow[4] !== null && fkRow[4] !== undefined && String(fkRow[4]) !== 'null'
+                  ? String(fkRow[4])
+                  : 'id';
 
               const colObj = columns.find((c) => c.name.toLowerCase() === fromCol.toLowerCase());
               if (colObj) {
@@ -180,6 +183,34 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
                 toColumn: toCol,
               });
             }
+          }
+
+          // Get table indexes via PRAGMA
+          const indexes: Array<{ name: string; columns: string[]; isUnique: boolean }> = [];
+          try {
+            const indexListResult = db.exec(`PRAGMA index_list("${tableName}");`);
+            if (indexListResult && indexListResult.length > 0) {
+              for (const idxRow of indexListResult[0].values) {
+                const idxName = String(idxRow[1]);
+                const isUnique = idxRow[2] === 1;
+                const idxCols: string[] = [];
+
+                const infoResult = db.exec(`PRAGMA index_info("${idxName}");`);
+                if (infoResult && infoResult.length > 0) {
+                  for (const infoRow of infoResult[0].values) {
+                    idxCols.push(String(infoRow[2]));
+                  }
+                }
+
+                indexes.push({
+                  name: idxName,
+                  columns: idxCols,
+                  isUnique,
+                });
+              }
+            }
+          } catch {
+            // Index pragma optional
           }
 
           // Get row count
@@ -198,7 +229,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
             columns,
             primaryKey: columns.filter((c) => c.isPrimaryKey).map((c) => c.name),
             foreignKeys: foreignKeys.filter((f) => f.fromTable === tableName),
-            indexes: [],
+            indexes,
             rowCount,
             ddlSql,
           };
@@ -213,6 +244,28 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
       });
       const orphanTables = Object.keys(tables).filter((t) => !referenced.has(t));
 
+      // Find missing index on FK columns
+      const missingIndexFkColumns: Array<{ table: string; column: string }> = [];
+      foreignKeys.forEach((fk) => {
+        const tableObj = tables[fk.fromTable] as {
+          indexes?: Array<{ columns: string[] }>;
+          primaryKey?: string[];
+        } | undefined;
+
+        if (tableObj) {
+          const hasIdx = tableObj.indexes?.some((idx) =>
+            idx.columns.some((c) => c.toLowerCase() === fk.fromColumn.toLowerCase())
+          );
+          const isPk = tableObj.primaryKey?.some((pk) => pk.toLowerCase() === fk.fromColumn.toLowerCase());
+          if (!hasIdx && !isPk) {
+            missingIndexFkColumns.push({
+              table: fk.fromTable,
+              column: fk.fromColumn,
+            });
+          }
+        }
+      });
+
       self.postMessage({
         id,
         success: true,
@@ -220,7 +273,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
           tables,
           foreignKeys,
           orphanTables,
-          missingIndexFkColumns: [],
+          missingIndexFkColumns,
         },
       });
       return;

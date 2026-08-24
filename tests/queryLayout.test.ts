@@ -41,4 +41,31 @@ describe('Graph Layout Engines', () => {
     expect(schemaGraph.edges[0].source).toBe('table_posts');
     expect(schemaGraph.edges[0].target).toBe('table_users');
   });
+
+  it('connects CTE nodes to downstream source nodes that reference them', () => {
+    const sql = `
+      WITH active_users AS (
+        SELECT id, name FROM users WHERE active = 1
+      )
+      SELECT a.name, o.total
+      FROM active_users a
+      JOIN orders o ON a.id = o.user_id;
+    `;
+    const { model } = parseSQL(sql);
+    const graph = buildQueryGraph(model);
+
+    expect(graph.nodes.some((n) => n.type === 'cteNode')).toBe(true);
+    const cteEdge = graph.edges.find((e) => e.source === 'cte_0');
+    expect(cteEdge).toBeDefined();
+    expect(cteEdge?.target).toBe('source_src_0');
+  });
+
+  it('renders dual/values node for queries without a FROM clause', () => {
+    const sql = 'SELECT 1 + 1 AS result;';
+    const { model } = parseSQL(sql);
+    const graph = buildQueryGraph(model);
+
+    expect(graph.nodes.some((n) => n.id === 'source_dual')).toBe(true);
+    expect(graph.nodes.some((n) => n.type === 'outputNode')).toBe(true);
+  });
 });
