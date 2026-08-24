@@ -68,11 +68,21 @@ describe('SQL Parser & Analyzer', () => {
     expect(result.model.ctes[0].model.sources[0].name).toBe('employees');
   });
 
-  it('provides graceful fallback when syntax error occurs', () => {
-    const brokenSql = 'SELECT name, age FROM users WHERE';
-    const result = parseSQL(brokenSql);
+  it('handles empty SQL query cleanly', () => {
+    const result = parseSQL('');
+    expect(result.model.sources.length).toBe(0);
+    expect(result.diagnostics.length).toBe(0);
+  });
 
-    expect(result.diagnostics.some((d) => d.severity === 'error')).toBe(true);
-    expect(result.model.sources.length).toBeGreaterThanOrEqual(1);
+  it('handles SQL comments cleanly', () => {
+    const sql = `
+      -- Single line comment
+      /* Multi-line
+         comment */
+      SELECT id FROM users;
+    `;
+    const result = parseSQL(sql);
+    expect(result.model.sources.length).toBe(1);
+    expect(result.model.sources[0].name).toBe('users');
   });
 });

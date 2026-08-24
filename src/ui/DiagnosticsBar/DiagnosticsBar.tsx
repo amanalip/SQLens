@@ -52,7 +52,9 @@ export const DiagnosticsBar: React.FC<DiagnosticsBarProps> = ({
             ) : (
               <Info size={12} />
             )}
-            {d.line && <span className={styles.badge}>Line {d.line}</span>}
+            {typeof d.line === 'number' && d.line > 0 && (
+              <span className={styles.badge}>Line {d.line}</span>
+            )}
             <span className={styles.message}>{d.message}</span>
           </div>
         );

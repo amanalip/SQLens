@@ -14,6 +14,7 @@ export const TableNode: React.FC<NodeProps> = ({ data, selected }) => {
 
   return (
     <div className={`${styles.nodeCard} ${selected ? styles.selected : ''}`}>
+      <Handle type="target" position={Position.Left} style={{ background: '#3b82f6' }} />
       <div className={styles.nodeHeader} style={{ borderLeft: '3px solid var(--node-table, #3b82f6)' }}>
         <div className={styles.headerIcon} style={{ background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6' }}>
           <Database size={13} />

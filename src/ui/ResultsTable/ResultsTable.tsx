@@ -78,12 +78,21 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
 
   const generateCsv = (): string => {
     if (!result || result.columns.length === 0) return '';
-    const header = result.columns.map((c) => `"${c.replace(/"/g, '""')}"`).join(',');
+    const header = result.columns.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',');
     const rows = result.values
       .map((row) =>
         row
           .map((cell) => {
             if (cell === null || cell === undefined) return '';
+            if (typeof cell === 'number') return String(cell);
+            if (typeof cell === 'boolean') return cell ? 'TRUE' : 'FALSE';
+            if (typeof cell === 'object') {
+              try {
+                return `"${JSON.stringify(cell).replace(/"/g, '""')}"`;
+              } catch {
+                return '""';
+              }
+            }
             const cellStr = String(cell).replace(/"/g, '""');
             return `"${cellStr}"`;
           })
