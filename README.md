@@ -4,24 +4,9 @@
   <img src="public/sqlens-logo.svg" alt="SQLens Detective Logo" width="140" height="140" />
 </p>
 
-```text
-       ,----.
-     .´  __  `.
-   .´   (__)   `.
-  /______________\
-     (  o   o  )
-      \   ^   /        .---.
-       ) === (       .´     `.
-      /       \     /  SQL   \
-     / |     | \    |  .---.  |
-    (  |     |  )   \ ( DB  ) /
-     `-'-----`-'     `.`---'.´
-                       \   /
-                        \ /
-                         `
-```
-
-**Clarity for every query.**
+<p align="center">
+  <strong>Clarity for every query.</strong>
+</p>
 
 SQLens is a browser-based tool that turns SQL queries into interactive visual data flow graphs and executes them against real databases inside your browser. No backend services, no user accounts, and no data leaving your machine.
 
