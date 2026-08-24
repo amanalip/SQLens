@@ -33,4 +33,28 @@ describe('URL State Codec', () => {
     expect(decodeStateFromHash('#')).toBeNull();
     expect(decodeStateFromHash('invalid_corrupted_hash_data_12345')).toBeNull();
   });
+
+  it('normalizes empty or whitespace dbId to undefined', () => {
+    const original: AppUrlState = {
+      sql: 'SELECT 1;',
+      dbId: '   ',
+      mode: 'query',
+    };
+    const hash = encodeStateToHash(original);
+    const decoded = decodeStateFromHash(hash);
+    expect(decoded?.dbId).toBeUndefined();
+    expect(decoded?.sql).toBe('SELECT 1;');
+  });
+
+  it('handles percent-encoded hashes gracefully', () => {
+    const original: AppUrlState = {
+      sql: 'SELECT 42;',
+      dbId: 'chinook',
+      mode: 'query',
+    };
+    const hash = encodeStateToHash(original);
+    const encodedHash = encodeURIComponent(hash);
+    const decoded = decodeStateFromHash(encodedHash);
+    expect(decoded).toEqual(original);
+  });
 });

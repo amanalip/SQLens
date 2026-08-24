@@ -64,4 +64,10 @@ describe('SQL Diagnostics Engine', () => {
     expect(errDiag).toBeDefined();
     expect(errDiag?.id).toBe('syntax-error');
   });
+
+  it('does not flag Cartesian join when USING condition is used', () => {
+    const res = parseSQL('SELECT artist_id, title FROM artists JOIN albums USING (artist_id);');
+    const cartDiag = res.diagnostics.find((d) => d.id === 'cartesian-join');
+    expect(cartDiag).toBeUndefined();
+  });
 });
