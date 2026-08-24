@@ -1,8 +1,25 @@
 # SQLens
 
+```text
+       ,----.
+     .´  __  `.
+   .´   (__)   `.
+  /______________\
+     (  o   o  )
+      \   ^   /        .---.
+       ) === (       .´     `.
+      /       \     /  SQL   \
+     / |     | \    |  .---.  |
+    (  |     |  )   \ ( DB  ) /
+     `-'-----`-'     `.`---'.´
+                       \   /
+                        \ /
+                         `
+```
+
 **Clarity for every query.**
 
-SQLens is a browser-based tool that parses SQL queries into interactive visual data flow graphs and executes them against real databases inside your browser. No backend services, no user accounts, and no data leaving your machine.
+SQLens is a browser-based tool that turns SQL queries into interactive visual data flow graphs and executes them against real databases inside your browser. No backend services, no user accounts, and no data leaving your machine.
 
 The application runs entirely client-side as a static web app. Query execution is powered by SQLite compiled to WebAssembly (`sql.js`) inside a Web Worker.
 
