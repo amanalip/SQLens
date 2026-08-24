@@ -48,17 +48,19 @@ export function exprToString(expr: unknown): string {
   }
 
   if (node.type === 'aggr_func') {
-    const funcName = node.name || 'AGG';
-    const inner = node.args ? exprToString(node.args.expr || node.args) : '';
-    const distinct = (node.args as { distinct?: boolean })?.distinct ? 'DISTINCT ' : '';
+    const funcName = (node.name as string) || 'AGG';
+    const argsObj = node.args as Record<string, unknown> | undefined;
+    const inner = argsObj ? exprToString(argsObj.expr || argsObj) : '';
+    const distinct = (argsObj as { distinct?: boolean })?.distinct ? 'DISTINCT ' : '';
     return `${funcName}(${distinct}${inner})`;
   }
 
   if (node.type === 'function') {
     const funcName = node.name ? (typeof node.name === 'object' ? (node.name as { name?: { value: string }[] }).name?.[0]?.value : node.name) : 'FUNC';
-    const args = Array.isArray(node.args?.value)
-      ? node.args.value.map((a: unknown) => exprToString(a)).join(', ')
-      : exprToString(node.args);
+    const argsObj = node.args as Record<string, unknown> | undefined;
+    const args = Array.isArray(argsObj?.value)
+      ? (argsObj?.value as unknown[]).map((a: unknown) => exprToString(a)).join(', ')
+      : exprToString(argsObj);
     return `${funcName}(${args})`;
   }
 
@@ -244,7 +246,6 @@ export function analyzeAst(ast: unknown, rawSql: string): QueryModel {
 
   columnsList.forEach((col: Record<string, unknown>, index: number) => {
     const isStar =
-      col === '*' ||
       col.expr === '*' ||
       (col.expr && typeof col.expr === 'object' && (col.expr as Record<string, unknown>).type === 'star') ||
       (col.expr && typeof col.expr === 'object' && (col.expr as Record<string, unknown>).column === '*') ||

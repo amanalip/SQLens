@@ -1,0 +1,88 @@
+.editorContainer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-secondary, #161d27);
+  border-right: 1px solid var(--border, #2a3649);
+  position: relative;
+  overflow: hidden;
+}
+
+.editorHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--bg-primary, #0f141c);
+  border-bottom: 1px solid var(--border, #2a3649);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary, #9ca3af);
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.runButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent, #3b82f6);
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.runButton:hover {
+  background: var(--accent-hover, #2563eb);
+}
+
+.runButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.toolButton {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  color: var(--text-secondary, #9ca3af);
+  border: 1px solid var(--border, #2a3649);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.toolButton:hover {
+  color: var(--text-primary, #f3f4f6);
+  border-color: var(--text-secondary, #9ca3af);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.editorCanvas {
+  flex: 1;
+  height: 100%;
+  overflow: auto;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.editorCanvas :global(.cm-editor) {
+  height: 100%;
+}
+
+.editorCanvas :global(.cm-scroller) {
+  overflow: auto;
+  font-family: inherit;
+}

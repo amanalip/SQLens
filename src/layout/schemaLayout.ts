@@ -17,7 +17,6 @@ export function buildSchemaGraph(schema: SchemaModel): SchemaLayoutResult {
 
   // Grid layout calculation
   const COLUMNS_COUNT = Math.min(4, Math.max(2, Math.ceil(Math.sqrt(tableNames.length))));
-  const CARD_WIDTH = 300;
   const X_SPACING = 360;
   const Y_SPACING = 340;
 
