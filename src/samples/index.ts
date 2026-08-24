@@ -11,6 +11,16 @@ import { pokemonSamples } from './pokemon';
 import { universitySamples } from './university';
 import { premierLeagueSamples } from './premierLeague';
 import { ecommerceSamples } from './ecommerce';
+import { githubSamples } from './github';
+import { flightsSamples } from './flights';
+import { hospitalSamples } from './hospital';
+import { realEstateSamples } from './realEstate';
+import { stocksSamples } from './stocks';
+import { foodDeliverySamples } from './foodDelivery';
+import { librarySamples } from './library';
+import { gamingSamples } from './gaming';
+import { cryptoSamples } from './crypto';
+import { hotelsSamples } from './hotels';
 
 export {
   chinookSamples,
@@ -26,6 +36,16 @@ export {
   universitySamples,
   premierLeagueSamples,
   ecommerceSamples,
+  githubSamples,
+  flightsSamples,
+  hospitalSamples,
+  realEstateSamples,
+  stocksSamples,
+  foodDeliverySamples,
+  librarySamples,
+  gamingSamples,
+  cryptoSamples,
+  hotelsSamples,
 };
 
 export type { SampleQuery };
@@ -157,5 +177,95 @@ export const bundledDatabases: BundledDatabase[] = [
     bestFor: 'Commercial metrics, reviews, seller ratings',
     filename: './databases/ecommerce.sqlite',
     samples: ecommerceSamples,
+  },
+  {
+    id: 'github',
+    name: 'GitHub Analytics',
+    description: 'Repositories, contributors, commits, pull requests, stars',
+    size: '~1 MB',
+    bestFor: 'Developer metrics, PR reviews, commit stats',
+    filename: './databases/github.sqlite',
+    samples: githubSamples,
+  },
+  {
+    id: 'flights',
+    name: 'Airlines & Flights',
+    description: 'Airports, carriers, routes, delays, flight schedules',
+    size: '~1.5 MB',
+    bestFor: 'Delay metrics, route pairs, time calculations',
+    filename: './databases/flights.sqlite',
+    samples: flightsSamples,
+  },
+  {
+    id: 'hospital',
+    name: 'Hospital Healthcare',
+    description: 'Patients, admissions, doctors, departments, medications',
+    size: '~1 MB',
+    bestFor: 'Healthcare analytics, bed occupancy, pharmacy costs',
+    filename: './databases/hospital.sqlite',
+    samples: hospitalSamples,
+  },
+  {
+    id: 'real_estate',
+    name: 'Real Estate',
+    description: 'Properties, neighborhoods, agents, sale listings, prices',
+    size: '~1 MB',
+    bestFor: 'Price per sqft, agent commissions, neighborhood stats',
+    filename: './databases/real_estate.sqlite',
+    samples: realEstateSamples,
+  },
+  {
+    id: 'stocks',
+    name: 'Stock Market',
+    description: 'Tickers, daily OHLCV prices, portfolios, sector valuation',
+    size: '~1 MB',
+    bestFor: 'Financial math, unrealized gains, market caps',
+    filename: './databases/stocks.sqlite',
+    samples: stocksSamples,
+  },
+  {
+    id: 'food_delivery',
+    name: 'Food Delivery',
+    description: 'Restaurants, cuisines, orders, couriers, tips, durations',
+    size: '~1.5 MB',
+    bestFor: 'Delivery metrics, courier earnings, cuisine sales',
+    filename: './databases/food_delivery.sqlite',
+    samples: foodDeliverySamples,
+  },
+  {
+    id: 'library',
+    name: 'Library System',
+    description: 'Books, authors, members, active loans, overdue fines',
+    size: '~500 KB',
+    bestFor: 'Active checkouts, genre analytics, fine balances',
+    filename: './databases/library.sqlite',
+    samples: librarySamples,
+  },
+  {
+    id: 'gaming',
+    name: 'Gaming Leaderboard',
+    description: 'Players, guilds, matches, weapons, kills, deaths, scores',
+    size: '~1 MB',
+    bestFor: 'K/D ratios, win rates, weapon stats, rankings',
+    filename: './databases/gaming.sqlite',
+    samples: gamingSamples,
+  },
+  {
+    id: 'crypto',
+    name: 'Crypto Ledgers',
+    description: 'Tokens, wallets, balances, transactions, gas fees',
+    size: '~1 MB',
+    bestFor: 'Wallet valuations, transaction volume, gas summaries',
+    filename: './databases/crypto.sqlite',
+    samples: cryptoSamples,
+  },
+  {
+    id: 'hotels',
+    name: 'Hotel Bookings',
+    description: 'Hotels, rooms, guest reservations, nightly rates, revenue',
+    size: '~1 MB',
+    bestFor: 'Occupancy rates, guest lifetime value, city revenue',
+    filename: './databases/hotels.sqlite',
+    samples: hotelsSamples,
   },
 ];

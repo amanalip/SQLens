@@ -19,7 +19,7 @@ The application runs entirely client-side as a static web app. Query execution i
 - **Query Flow DAG**: Transforms SQL queries into visual data flow graphs showing table sources, joins, filters, aggregates, groupings, sorting, and output projections.
 - **Schema Explorer (ER Diagrams)**: Renders entity-relationship diagrams from database schemas with primary keys, foreign keys, and relationship links.
 - **In-Browser SQLite Playground**: Runs real queries in a background Web Worker without blocking the main UI thread.
-- **13 Bundled Public Databases**: Pre-loaded SQLite datasets with curated educational queries.
+- **23 Bundled Public Databases**: Pre-loaded SQLite datasets with curated educational queries.
 - **CodeMirror 6 Editor**: SQL syntax highlighting, bracket matching, schema-aware autocomplete for tables and columns, and `Ctrl+Enter` execution.
 - **Diagnostics**: Real-time syntax and structural query warnings with click-to-jump line navigation.
 - **Sharing & Export**: URL state compression via LZ-string to share queries, plus PNG export for graph diagrams and CSV export for results.
@@ -44,6 +44,16 @@ The application runs entirely client-side as a static web app. Query execution i
 | **University** | Student enrollment and course catalog | ~500 KB | Transcripts, class size CTEs |
 | **Premier League** | Football matches, standings, goal scorers | ~1 MB | Table standings calculation, points CTE |
 | **E-Commerce** | Online orders, product categories, reviews | ~1.5 MB | Review averages, seller performance |
+| **GitHub Analytics** | Repositories, contributors, commits, pull requests | ~1 MB | Developer metrics, PR reviews, commit stats |
+| **Airlines & Flights** | Airports, carriers, routes, delays, schedules | ~1.5 MB | Delay metrics, route pairs, time calculations |
+| **Hospital Healthcare** | Patients, admissions, doctors, departments, medications | ~1 MB | Healthcare analytics, bed occupancy, pharmacy costs |
+| **Real Estate** | Properties, neighborhoods, agents, sale listings | ~1 MB | Price per sqft, agent commissions, neighborhood stats |
+| **Stock Market** | Tickers, daily OHLCV prices, portfolios, sector stats | ~1 MB | Financial math, unrealized gains, market caps |
+| **Food Delivery** | Restaurants, cuisines, orders, couriers, tips | ~1.5 MB | Delivery metrics, courier earnings, cuisine sales |
+| **Library System** | Books, authors, members, active loans, fines | ~500 KB | Active checkouts, genre analytics, fine balances |
+| **Gaming Leaderboard** | Players, guilds, matches, weapons, kills, scores | ~1 MB | K/D ratios, win rates, weapon stats, rankings |
+| **Crypto Ledgers** | Tokens, wallets, balances, transactions, gas fees | ~1 MB | Wallet valuations, transaction volume, gas summaries |
+| **Hotel Bookings** | Hotels, rooms, guest reservations, nightly rates | ~1 MB | Occupancy rates, guest lifetime value, city revenue |
 
 ---
 
