@@ -15,32 +15,39 @@ class SqlEngineClient {
     if (this.initPromise) return this.initPromise;
 
     this.initPromise = (async () => {
-      // Instantiate worker with Vite worker constructor
-      this.worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
+      try {
+        // Instantiate worker with Vite worker constructor
+        this.worker = new Worker(new URL('./worker.ts', import.meta.url), { type: 'module' });
 
-      this.worker.onmessage = (event: MessageEvent) => {
-        const { id, success, result, schema, error } = event.data;
-        const request = this.pendingRequests.get(id);
+        this.worker.onmessage = (event: MessageEvent) => {
+          const { id, success, result, schema, error } = event.data;
+          const request = this.pendingRequests.get(id);
 
-        if (request) {
-          this.pendingRequests.delete(id);
-          if (success) {
-            resolveRequest(request.resolve, { result, schema });
-          } else {
-            request.reject(new Error(error || 'Worker request failed'));
+          if (request) {
+            this.pendingRequests.delete(id);
+            if (success) {
+              resolveRequest(request.resolve, { result, schema });
+            } else {
+              request.reject(new Error(error || 'Worker request failed'));
+            }
           }
-        }
-      };
+        };
 
-      this.worker.onerror = (error) => {
-        console.error('Worker error:', error);
-      };
+        this.worker.onerror = (error) => {
+          console.error('Worker error:', error);
+        };
 
-      const baseUrl = import.meta.env.BASE_URL || './';
-      const wasmUrl = new URL(`${baseUrl}sql-wasm.wasm`, window.location.href).href;
+        const baseUrl = import.meta.env.BASE_URL || './';
+        const wasmUrl = new URL(`${baseUrl}sql-wasm.wasm`, window.location.href).href;
 
-      await this.sendRequest('INIT', { wasmUrl });
-      this.isInitialized = true;
+        await this.sendRequest('INIT', { wasmUrl });
+        this.isInitialized = true;
+      } catch (err) {
+        this.initPromise = null;
+        this.worker = null;
+        this.isInitialized = false;
+        throw err;
+      }
     })();
 
     return this.initPromise;
