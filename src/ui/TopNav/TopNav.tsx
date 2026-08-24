@@ -105,6 +105,7 @@ export const TopNav: React.FC<TopNavProps> = ({
             onChange={(e) => onDbChange(e.target.value)}
             disabled={isLoadingDb}
             title="Select SQLite database"
+            aria-label="Select database"
           >
             {bundledDatabases.map((db) => (
               <option key={db.id} value={db.id}>
@@ -125,6 +126,7 @@ export const TopNav: React.FC<TopNavProps> = ({
                 }
               }}
               title="Pick an example query"
+              aria-label="Pick an example query"
             >
               <option value="" disabled>
                 Example Queries...
@@ -144,6 +146,7 @@ export const TopNav: React.FC<TopNavProps> = ({
           className={styles.actionButton}
           onClick={handleShareClick}
           title="Share query via compressed URL hash"
+          aria-label="Share query via URL"
         >
           {copiedShare ? <Check size={13} color="#10b981" /> : <Share2 size={13} />}
           <span>{copiedShare ? 'Link Copied' : 'Share'}</span>
@@ -153,6 +156,7 @@ export const TopNav: React.FC<TopNavProps> = ({
           className={styles.actionButton}
           onClick={onExportPng}
           title="Export graph as PNG image"
+          aria-label="Export graph as PNG image"
         >
           <Download size={13} />
           <span>Export PNG</span>
@@ -162,6 +166,7 @@ export const TopNav: React.FC<TopNavProps> = ({
           className={styles.actionButton}
           onClick={onToggleTheme}
           title="Toggle light or dark theme"
+          aria-label="Toggle light or dark theme"
         >
           {theme === 'dark' ? <Sun size={13} /> : <Moon size={13} />}
         </button>
@@ -170,6 +175,7 @@ export const TopNav: React.FC<TopNavProps> = ({
           className={styles.actionButton}
           onClick={() => setShowHelp(!showHelp)}
           title="Keyboard shortcuts and guide"
+          aria-label="Keyboard shortcuts and guide"
         >
           <HelpCircle size={13} />
         </button>
