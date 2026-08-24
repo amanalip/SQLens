@@ -20,9 +20,10 @@ export function detectDialect(sql: string): SQLDialect {
     normalized.includes('auto_increment') ||
     normalized.includes('`') ||
     normalized.includes('straight_join') ||
-    normalized.includes('ifnull(') ||
     normalized.includes('show tables') ||
-    normalized.includes('show databases')
+    normalized.includes('show databases') ||
+    normalized.includes('curdate()') ||
+    normalized.includes('unix_timestamp(')
   ) {
     return 'mysql';
   }
