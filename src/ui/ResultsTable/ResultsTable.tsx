@@ -47,6 +47,13 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
         if (typeof val === 'boolean') {
           return String(val).toUpperCase();
         }
+        if (typeof val === 'object') {
+          try {
+            return JSON.stringify(val);
+          } catch {
+            return '[Object]';
+          }
+        }
         return String(val);
       },
     }));

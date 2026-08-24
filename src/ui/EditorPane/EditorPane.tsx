@@ -55,7 +55,8 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
           const doc = view.state.doc;
           const targetLine = Math.min(Math.max(1, line), doc.lines);
           const lineObj = doc.line(targetLine);
-          const targetPos = Math.min(lineObj.from + (column - 1), lineObj.to);
+          const safeColumn = Math.max(1, column);
+          const targetPos = Math.min(lineObj.from + (safeColumn - 1), lineObj.to);
 
           view.dispatch({
             selection: { anchor: targetPos, head: targetPos },

@@ -11,9 +11,14 @@ export async function exportGraphToPng(containerElement: HTMLElement, filename =
       backgroundColor: computedBg,
       quality: 0.95,
       filter: (node) => {
-        // Exclude minimap or controls from screenshot if needed
-        const className = (node as HTMLElement).className || '';
-        if (typeof className === 'string' && className.includes('react-flow__controls')) {
+        // Exclude minimap and controls from screenshot
+        const el = node as HTMLElement;
+        const cls =
+          typeof el.className === 'string'
+            ? el.className
+            : (node as unknown as SVGElement).className?.baseVal || '';
+
+        if (cls.includes('react-flow__controls') || cls.includes('react-flow__minimap')) {
           return false;
         }
         return true;

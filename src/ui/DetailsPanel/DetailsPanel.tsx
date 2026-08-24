@@ -71,12 +71,28 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
             {table.columns?.map((c) => (
               <div key={c.name} className={styles.propertyRow}>
                 <span className={styles.propertyLabel}>
-                  {c.name} {c.isPrimaryKey ? '(PK)' : ''} {c.isForeignKey ? '(FK)' : ''}
+                  {c.name} {c.isPrimaryKey ? '(PK)' : ''} {c.isForeignKey ? '(FK)' : ''} {c.isUnique && !c.isPrimaryKey ? '(UQ)' : ''}
                 </span>
                 <span className={styles.propertyValue}>{c.type}</span>
               </div>
             ))}
           </div>
+
+          {table.indexes && table.indexes.length > 0 && (
+            <div className={styles.section}>
+              <div className={styles.sectionTitle}>Indexes ({table.indexes.length})</div>
+              {table.indexes.map((idx) => (
+                <div key={idx.name} className={styles.propertyRow}>
+                  <span className={styles.propertyLabel}>
+                    {idx.name} {idx.isUnique ? '(Unique)' : ''}
+                  </span>
+                  <span className={styles.propertyValue}>
+                    {idx.columns.join(', ')}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
 
           {table.foreignKeys?.length > 0 && (
             <div className={styles.section}>

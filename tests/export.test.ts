@@ -55,4 +55,16 @@ describe('CSV Formatter Unit Tests', () => {
     const csv = formatCsv(cols, rows);
     expect(csv).toContain('1,\n2,');
   });
+
+  it('serializes JSON objects cleanly in CSV cells', () => {
+    const cols = ['id', 'metadata'];
+    const rows = [[1, { role: 'admin', active: true }]];
+
+    const csv = formatCsv(cols, rows);
+    expect(csv).toContain('"{""role"":""admin"",""active"":true}"');
+  });
+
+  it('returns empty string for zero-column results', () => {
+    expect(formatCsv([], [])).toBe('');
+  });
 });
