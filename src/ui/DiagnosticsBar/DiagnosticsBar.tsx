@@ -39,17 +39,25 @@ export const DiagnosticsBar: React.FC<DiagnosticsBarProps> = ({
           <div
             key={`${d.id}_${index}`}
             className={`${styles.item} ${itemClass}`}
+            role={hasLine ? 'button' : undefined}
+            tabIndex={hasLine ? 0 : undefined}
             onClick={() => {
               if (hasLine && onJumpToLine) {
+                onJumpToLine(Math.max(1, d.line!), d.column);
+              }
+            }}
+            onKeyDown={(e) => {
+              if (hasLine && onJumpToLine && (e.key === 'Enter' || e.key === ' ')) {
+                e.preventDefault();
                 onJumpToLine(Math.max(1, d.line!), d.column);
               }
             }}
             style={{ cursor: hasLine ? 'pointer' : 'default' }}
             title={
               d.suggestion
-                ? `${d.suggestion}${hasLine ? ' (Click to jump to line)' : ''}`
+                ? `${d.suggestion}${hasLine ? ' (Click or press Enter to jump to line)' : ''}`
                 : hasLine
-                ? 'Click to jump to line in editor'
+                ? 'Click or press Enter to jump to line in editor'
                 : undefined
             }
           >
