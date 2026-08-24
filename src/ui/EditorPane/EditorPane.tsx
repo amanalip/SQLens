@@ -12,7 +12,7 @@ import { sql, SQLite } from '@codemirror/lang-sql';
 import { autocompletion, closeBrackets } from '@codemirror/autocomplete';
 import { setDiagnostics, Diagnostic } from '@codemirror/lint';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { Play, Upload, Sparkles, RotateCcw } from 'lucide-react';
+import { Play, Upload, Sparkles, RotateCcw, Maximize2, Minimize2 } from 'lucide-react';
 import { DiagnosticWarning } from '../../model/diagnostics';
 import { SchemaModel } from '../../model/schema';
 import styles from './EditorPane.module.css';
@@ -31,10 +31,12 @@ interface EditorPaneProps {
   schema?: SchemaModel;
   theme?: 'dark' | 'light';
   isExecuting?: boolean;
+  isExpanded?: boolean;
+  onToggleExpand?: () => void;
 }
 
 export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
-  ({ value, onChange, onRunQuery, diagnostics, schema, theme = 'dark', isExecuting = false }, ref) => {
+  ({ value, onChange, onRunQuery, diagnostics, schema, theme = 'dark', isExecuting = false, isExpanded = false, onToggleExpand }, ref) => {
     const editorContainerRef = useRef<HTMLDivElement>(null);
     const editorViewRef = useRef<EditorView | null>(null);
     const schemaCompartment = useRef(new Compartment());
@@ -354,8 +356,21 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
               ref={fileInputRef}
               style={{ display: 'none' }}
               accept=".sql,.txt"
+              aria-label="Upload SQL file"
               onChange={handleFileUpload}
             />
+
+            {onToggleExpand && (
+              <button
+                className={styles.toolButton}
+                onClick={onToggleExpand}
+                aria-label={isExpanded ? 'Collapse editor pane width' : 'Extend editor pane width'}
+                title={isExpanded ? 'Collapse editor pane width (480px)' : 'Extend editor pane width (800px)'}
+              >
+                {isExpanded ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+                <span>{isExpanded ? 'Collapse' : 'Extend'}</span>
+              </button>
+            )}
 
             <button
               className={styles.runButton}

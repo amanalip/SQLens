@@ -501,60 +501,93 @@
 
 ---
 
-## UI/UX Enhancements Added
+## 55. Extendable Editor with Draggable Horizontal & Vertical Resizers
 
-1. **Quick-Clear Table Search via Escape**: Pressing `Escape` while focused in the Schema Mode filter input clears the search query instantly.
-2. **Accessible Schema Filter Input**: Search input and clear button include standard ARIA labels and tooltips.
-3. **Zero-Stringify Fallbacks in Inspector**: Inspector panel never displays raw `"undefined"` text for missing node metadata.
-4. **Enhanced Projection Breakdown in Inspector**: Projections and CTE outputs dynamically resolve aliases and expressions.
-5. **Non-Blocking Foreign Key Labels**: Relationship labels in schema graphs allow click-through and smooth panning.
-6. **Descriptive Table Card Subtitles**: Query flow cards display clean badges for standalone source tables.
-7. **Complete Modal Accessibility**: Help and keyboard shortcuts dialog conforms to dialog ARIA standards.
-8. **Comprehensive Toolbar Hints**: Query editor buttons include descriptive tooltips and ARIA descriptors.
-9. **Instant CTE Data Flow Inspection**: CTE nodes display synthesized data flow summaries based on active sources.
-10. **Clean Output Formatting Across Panes**: Results tables, inspector drawers, and canvas nodes render synchronized SQL expressions.
-11. **Action-Appropriate Download Icon in Results Table**: Download CSV button features a dedicated file download glyph instead of a clipboard copy glyph.
-12. **Accessible Inspector Drawer Controls**: Close buttons across inspector drawers include clear tooltips and keyboard accessibility attributes.
-13. **Interactive Line Jump Tooltips**: Diagnostic warnings show contextual tooltips informing users that clicking jumps to the exact error line in the SQL editor.
-14. **Clean Zero-Row Pagination Display**: Results table pagination displays "Page 1 of 1" consistently even on 0-row results.
-15. **Normalized Brand Assets Loading**: Brand detective logo dynamically resolves relative to base URL paths across local, subpath, and root hosting.
-16. **Schema-Qualified Table Explorer**: Full support for schema-qualified table names (`public.users`, `"app"."orders"`) across schema graph rendering and details inspection.
-17. **Robust Node Expression Display**: Graph cards for Aggregate, Filter, Output, and Sort/Limit nodes display formatted expressions and clear fallback states.
-18. **Semantic Color-Coded Minimap Navigation**: Minimap displays distinctive colors per node type (Blue for Tables, Purple for Joins, Amber for Filters, Cyan for Aggregations, Magenta for Sorting, Green for Output, Violet for CTEs).
-19. **Schema Flow Color-Coded Minimap**: Schema minimap highlights connected tables in blue and orphan tables in amber.
-20. **MySQL Comma-Limit Support**: Correctly splits and displays limit count vs offset count when inspecting queries using MySQL `LIMIT offset, count` syntax.
-21. **Clean Graph PNG Export**: PNG exports omit UI overlay controls and minimap while preserving full diagram resolution.
-22. **JSON Output Formatter in Results**: JSON objects and arrays format cleanly in results table cells.
-23. **Table Index Inspector**: Full inspection for table indexes, uniqueness flags, and column lists in the table inspector drawer.
-24. **Overlap-Free Masonry Schema Layout**: Table cards in Schema Mode are placed in dynamic vertical columns that prevent tall tables from colliding.
-25. **Visual Unique Constraint Badges (UQ)**: Schema cards highlight unique keys with cyan `UQ` badges.
-26. **Session Reset Option in Error Boundary**: Recovery button allows users to reset broken state or corrupted hash parameters.
-27. **Chained CTE Ingress Ports**: Visual connection ports allow chaining between sub-pipelines.
-28. **Modal Keyboard Dismissal**: Pressing `Escape` closes the Help and Keyboard Shortcuts modal from anywhere in the app.
-29. **Dynamic Canvas Auto-Centering**: Resizing the window or toggling full screen automatically triggers a smooth graph re-center.
-30. **Advanced Performance Diagnostics**: Visual diagnostics warn about `ORDER BY RANDOM()` and redundant `DISTINCT` + `GROUP BY` patterns.
-31. **Target Handle Docking on Table Nodes**: Visual connections from CTEs and subqueries dock directly into source table cards.
-32. **Query Clear & Reset Button**: Dedicated Clear button in `EditorPane.tsx` to clear editor queries with one click.
-33. **Global Escape Key Dismissal**: `Escape` key listener in `src/App.tsx` to dismiss open node inspection drawers.
-34. **Cursor-Preserving Formatter**: Formatter maintains cursor and line position during keyword formatting.
-35. **Interactive Table Filter in Schema Explorer**: Real-time table search input in `SchemaFlowCanvas.tsx` to highlight matching tables and dim non-matching tables.
-36. **Download CSV & Page Size Controls**: "Download CSV" file export button and a page size selector (10, 25, 50, 100 rows per page) in `ResultsTable.tsx`.
-37. **Active Sort Direction Indicators**: Ascending (`ArrowUp`), descending (`ArrowDown`), and unsorted (`ArrowUpDown`) icons in results table headers.
-38. **Keyboard Shortcuts & Help Dialog**: Help modal in `TopNav.tsx` detailing key shortcuts (`Ctrl+Enter` to run, `Ctrl+Space` for autocomplete, node click inspection).
-39. **Dedicated Sort & Limit Inspector**: Full inspection for `ORDER BY` directions and `LIMIT / OFFSET` numbers in `DetailsPanel.tsx`.
+- **Issue**: The query editor pane had a fixed width (480px) and fixed results pane height (260px) that could not be extended, resized, or expanded.
+- **Fix**: Added interactive draggable horizontal and vertical resize handles with persistent width/height in `localStorage`, plus an Extend/Collapse toolbar button in `EditorPane.tsx`.
+- **Files Modified**:
+  - `src/App.tsx`
+  - `src/App.module.css`
+  - `src/ui/EditorPane/EditorPane.tsx`
 
 ---
 
-## Expanded Test Coverage (11 Test Suites, 54 Tests)
+## 56. GitHub Repository Logo and Link in Top Navigation
+
+- **Issue**: The top navigation header lacked a link to the project source code on GitHub.
+- **Fix**: Added a GitHub action button with an SVG icon linking directly to `https://github.com/amanalip/SQLens`.
+- **Files Modified**:
+  - `src/ui/TopNav/TopNav.tsx`
+
+---
+
+## 57. URL State Database ID Whitespace Normalization & Percent-Encoding
+
+- **Issue**: In `src/share/urlState.ts`, decoded database IDs containing whitespace were not normalized, causing failed lookups instead of falling back to default databases.
+- **Fix**: Added whitespace trimming and validation in `decodeStateFromHash` and added unit test coverage.
+- **Files Modified**:
+  - `src/share/urlState.ts`
+  - `tests/urlState.test.ts`
+
+---
+
+## UI/UX Enhancements Added
+
+1. **Extendable & Resizable Editor Layout**: Drag the vertical splitter to adjust results height or the horizontal splitter to adjust editor pane width.
+2. **Extend/Collapse Editor Toolbar Button**: Quick-toggle button in `EditorPane` to expand editor width to 800px or collapse to 480px.
+3. **GitHub Repository Navigation Link**: Quick-access GitHub link with icon in the Top Navigation bar.
+4. **Quick-Clear Table Search via Escape**: Pressing `Escape` while focused in the Schema Mode filter input clears the search query instantly.
+5. **Accessible Schema Filter Input**: Search input and clear button include standard ARIA labels and tooltips.
+6. **Zero-Stringify Fallbacks in Inspector**: Inspector panel never displays raw `"undefined"` text for missing node metadata.
+7. **Enhanced Projection Breakdown in Inspector**: Projections and CTE outputs dynamically resolve aliases and expressions.
+8. **Non-Blocking Foreign Key Labels**: Relationship labels in schema graphs allow click-through and smooth panning.
+9. **Descriptive Table Card Subtitles**: Query flow cards display clean badges for standalone source tables.
+10. **Complete Modal Accessibility**: Help and keyboard shortcuts dialog conforms to dialog ARIA standards.
+11. **Comprehensive Toolbar Hints**: Query editor buttons include descriptive tooltips and ARIA descriptors.
+12. **Instant CTE Data Flow Inspection**: CTE nodes display synthesized data flow summaries based on active sources.
+13. **Clean Output Formatting Across Panes**: Results tables, inspector drawers, and canvas nodes render synchronized SQL expressions.
+14. **Action-Appropriate Download Icon in Results Table**: Download CSV button features a dedicated file download glyph instead of a clipboard copy glyph.
+15. **Accessible Inspector Drawer Controls**: Close buttons across inspector drawers include clear tooltips and keyboard accessibility attributes.
+16. **Interactive Line Jump Tooltips**: Diagnostic warnings show contextual tooltips informing users that clicking jumps to the exact error line in the SQL editor.
+17. **Clean Zero-Row Pagination Display**: Results table pagination displays "Page 1 of 1" consistently even on 0-row results.
+18. **Normalized Brand Assets Loading**: Brand detective logo dynamically resolves relative to base URL paths across local, subpath, and root hosting.
+19. **Schema-Qualified Table Explorer**: Full support for schema-qualified table names (`public.users`, `"app"."orders"`) across schema graph rendering and details inspection.
+20. **Robust Node Expression Display**: Graph cards for Aggregate, Filter, Output, and Sort/Limit nodes display formatted expressions and clear fallback states.
+21. **Semantic Color-Coded Minimap Navigation**: Minimap displays distinctive colors per node type (Blue for Tables, Purple for Joins, Amber for Filters, Cyan for Aggregations, Magenta for Sorting, Green for Output, Violet for CTEs).
+22. **Schema Flow Color-Coded Minimap**: Schema minimap highlights connected tables in blue and orphan tables in amber.
+23. **MySQL Comma-Limit Support**: Correctly splits and displays limit count vs offset count when inspecting queries using MySQL `LIMIT offset, count` syntax.
+24. **Clean Graph PNG Export**: PNG exports omit UI overlay controls and minimap while preserving full diagram resolution.
+25. **JSON Output Formatter in Results**: JSON objects and arrays format cleanly in results table cells.
+26. **Table Index Inspector**: Full inspection for table indexes, uniqueness flags, and column lists in the table inspector drawer.
+27. **Overlap-Free Masonry Schema Layout**: Table cards in Schema Mode are placed in dynamic vertical columns that prevent tall tables from colliding.
+28. **Visual Unique Constraint Badges (UQ)**: Schema cards highlight unique keys with cyan `UQ` badges.
+29. **Session Reset Option in Error Boundary**: Recovery button allows users to reset broken state or corrupted hash parameters.
+30. **Chained CTE Ingress Ports**: Visual connection ports allow chaining between sub-pipelines.
+31. **Modal Keyboard Dismissal**: Pressing `Escape` closes the Help and Keyboard Shortcuts modal from anywhere in the app.
+32. **Dynamic Canvas Auto-Centering**: Resizing the window or toggling full screen automatically triggers a smooth graph re-center.
+33. **Advanced Performance Diagnostics**: Visual diagnostics warn about `ORDER BY RANDOM()` and redundant `DISTINCT` + `GROUP BY` patterns.
+34. **Target Handle Docking on Table Nodes**: Visual connections from CTEs and subqueries dock directly into source table cards.
+35. **Query Clear & Reset Button**: Dedicated Clear button in `EditorPane.tsx` to clear editor queries with one click.
+36. **Global Escape Key Dismissal**: `Escape` key listener in `src/App.tsx` to dismiss open node inspection drawers.
+37. **Cursor-Preserving Formatter**: Formatter maintains cursor and line position during keyword formatting.
+38. **Interactive Table Filter in Schema Explorer**: Real-time table search input in `SchemaFlowCanvas.tsx` to highlight matching tables and dim non-matching tables.
+39. **Download CSV & Page Size Controls**: "Download CSV" file export button and a page size selector (10, 25, 50, 100 rows per page) in `ResultsTable.tsx`.
+40. **Active Sort Direction Indicators**: Ascending (`ArrowUp`), descending (`ArrowDown`), and unsorted (`ArrowUpDown`) icons in results table headers.
+41. **Keyboard Shortcuts & Help Dialog**: Help modal in `TopNav.tsx` detailing key shortcuts (`Ctrl+Enter` to run, `Ctrl+Space` for autocomplete, node click inspection).
+42. **Dedicated Sort & Limit Inspector**: Full inspection for `ORDER BY` directions and `LIMIT / OFFSET` numbers in `DetailsPanel.tsx`.
+
+---
+
+## Expanded Test Coverage (11 Test Suites, 57 Tests)
 
 - `tests/export.test.ts`: CSV generator logic with nulls, booleans, objects, quotes, multiline strings, zero-column edge cases, and empty dataset pagination calculations.
 - `tests/schemaParser.test.ts`: Multi-word data types, composite primary keys, foreign keys, missing indexes, schema-qualified table names.
 - `tests/parser.test.ts`: Query parsing, USING clauses, multiple CTEs, comments handling, empty query handling, circular AST protection, and AST models.
 - `tests/queryAnalyzer.test.ts`: AST analysis for CTEs, joins, aggregations, subqueries in FROM, order by, MySQL comma limit/offset.
 - `tests/dialects.test.ts`: Dialect detection for PostgreSQL, MySQL, and SQLite.
-- `tests/diagnostics.test.ts`: Diagnostics for unbounded mutations, Cartesian joins, star projections, leading wildcards, random sorting, redundant distinct, syntax errors.
+- `tests/diagnostics.test.ts`: Diagnostics for unbounded mutations, Cartesian joins, star projections, leading wildcards, random sorting, redundant distinct, syntax errors, and USING clauses.
 - `tests/databaseCatalog.test.ts`: Verifies all 23 database sample queries parse without syntax errors.
 - `tests/theme.test.ts`: Validates light and dark theme palettes, contrast, and CSS variables.
 - `tests/schemaLayout.test.ts`: Graph layout, distinct handle IDs, orphan tables.
-- `tests/urlState.test.ts`: Codec encoding, hash prefixes, corruption handling.
+- `tests/urlState.test.ts`: Codec encoding, hash prefixes, corruption handling, whitespace trimming, percent-encoding.
 - `tests/queryLayout.test.ts`: Query flow DAG layout, CTE connections, dual table support.

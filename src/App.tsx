@@ -42,6 +42,68 @@ export function App() {
     data: Record<string, unknown>;
   } | null>(null);
 
+  // Resizable layout states
+  const [editorWidth, setEditorWidth] = useState<number>(() => {
+    const saved = localStorage.getItem('sqlens_editor_width');
+    return saved ? Math.max(280, Math.min(parseInt(saved, 10), 1200)) : 480;
+  });
+  const [isResizingHorizontal, setIsResizingHorizontal] = useState(false);
+
+  const [resultsHeight, setResultsHeight] = useState<number>(() => {
+    const saved = localStorage.getItem('sqlens_results_height');
+    return saved ? Math.max(80, Math.min(parseInt(saved, 10), 600)) : 240;
+  });
+  const [isResizingVertical, setIsResizingVertical] = useState(false);
+
+  const startHorizontalResize = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizingHorizontal(true);
+  }, []);
+
+  const startVerticalResize = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizingVertical(true);
+  }, []);
+
+  const handleToggleExpandEditor = useCallback(() => {
+    setEditorWidth((prev) => {
+      const next = prev >= 650 ? 480 : Math.min(800, window.innerWidth - 350);
+      localStorage.setItem('sqlens_editor_width', String(next));
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!isResizingHorizontal && !isResizingVertical) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isResizingHorizontal) {
+        const maxWidth = Math.max(400, window.innerWidth - 300);
+        const newWidth = Math.max(280, Math.min(e.clientX, maxWidth));
+        setEditorWidth(newWidth);
+        localStorage.setItem('sqlens_editor_width', String(newWidth));
+      }
+      if (isResizingVertical) {
+        const maxHeight = Math.max(200, window.innerHeight - 250);
+        const newHeight = Math.max(80, Math.min(window.innerHeight - e.clientY, maxHeight));
+        setResultsHeight(newHeight);
+        localStorage.setItem('sqlens_results_height', String(newHeight));
+      }
+    };
+
+    const handleMouseUp = () => {
+      setIsResizingHorizontal(false);
+      setIsResizingVertical(false);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizingHorizontal, isResizingVertical]);
+
   const editorRef = useRef<EditorPaneRef>(null);
   const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -203,27 +265,41 @@ export function App() {
         )}
 
         {mode === 'query' && (
-          <div className={styles.leftColumn}>
-            <div className={styles.editorSection}>
-              <EditorPane
-                ref={editorRef}
-                value={sqlQuery}
-                onChange={setSqlQuery}
-                onRunQuery={handleRunQuery}
+          <>
+            <div className={styles.leftColumn} style={{ width: editorWidth }}>
+              <div className={styles.editorSection}>
+                <EditorPane
+                  ref={editorRef}
+                  value={sqlQuery}
+                  onChange={setSqlQuery}
+                  onRunQuery={handleRunQuery}
+                  diagnostics={parseResult.diagnostics}
+                  schema={schema || undefined}
+                  theme={theme}
+                  isExecuting={isExecuting}
+                  isExpanded={editorWidth >= 650}
+                  onToggleExpand={handleToggleExpandEditor}
+                />
+              </div>
+              <DiagnosticsBar
                 diagnostics={parseResult.diagnostics}
-                schema={schema || undefined}
-                theme={theme}
-                isExecuting={isExecuting}
+                onJumpToLine={handleJumpToLine}
               />
+              <div
+                className={`${styles.resizerVertical} ${isResizingVertical ? styles.resizing : ''}`}
+                onMouseDown={startVerticalResize}
+                title="Drag to resize results / editor height"
+              />
+              <div className={styles.resultsSection} style={{ height: resultsHeight }}>
+                <ResultsTable result={queryResult} error={executionError} />
+              </div>
             </div>
-            <DiagnosticsBar
-              diagnostics={parseResult.diagnostics}
-              onJumpToLine={handleJumpToLine}
+            <div
+              className={`${styles.resizerHorizontal} ${isResizingHorizontal ? styles.resizing : ''}`}
+              onMouseDown={startHorizontalResize}
+              title="Drag to resize editor pane width"
             />
-            <div className={styles.resultsSection}>
-              <ResultsTable result={queryResult} error={executionError} />
-            </div>
-          </div>
+          </>
         )}
 
         <div className={styles.canvasColumn} ref={canvasRef}>
