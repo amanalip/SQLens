@@ -28,7 +28,9 @@ export const FilterNode: React.FC<NodeProps> = ({ data, selected }) => {
         </span>
       </div>
       <div className={styles.nodeBody}>
-        <div className={styles.codeSnippet}>{filterData.raw}</div>
+        <div className={styles.codeSnippet}>
+          {filterData.raw || (filterData.columns?.length ? filterData.columns.join(' AND ') : 'Condition')}
+        </div>
       </div>
       <Handle type="source" position={Position.Right} style={{ background: '#f59e0b' }} />
     </div>

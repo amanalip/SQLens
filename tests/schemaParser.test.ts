@@ -78,4 +78,28 @@ describe('Schema DDL Parser', () => {
     expect(table.indexes.length).toBe(1);
     expect(table.indexes[0].name).toBe('idx_metrics_date');
   });
+
+  it('parses schema-qualified table names in CREATE TABLE, ALTER TABLE, and CREATE INDEX', () => {
+    const ddl = `
+      CREATE TABLE "public"."customers" (
+        id INT PRIMARY KEY,
+        email TEXT NOT NULL
+      );
+      CREATE TABLE public.orders (
+        id INT PRIMARY KEY,
+        customer_id INT
+      );
+      ALTER TABLE public.orders ADD CONSTRAINT fk_orders_customer FOREIGN KEY (customer_id) REFERENCES public.customers(id);
+      CREATE INDEX idx_orders_customer ON public.orders (customer_id);
+    `;
+
+    const schema = parseSchemaSQL(ddl);
+    expect(schema.tables['customers']).toBeDefined();
+    expect(schema.tables['orders']).toBeDefined();
+    expect(schema.foreignKeys.length).toBe(1);
+    expect(schema.foreignKeys[0].fromTable).toBe('orders');
+    expect(schema.foreignKeys[0].toTable).toBe('customers');
+    expect(schema.tables['orders'].indexes.length).toBe(1);
+    expect(schema.tables['orders'].indexes[0].name).toBe('idx_orders_customer');
+  });
 });

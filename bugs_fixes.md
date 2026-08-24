@@ -1,6 +1,52 @@
 # Bug Fixes & Code Quality Log
 
-## 1. Circular AST JSON Stringifier Protection
+## 1. Schema-Qualified Table Name Support in DDL Parser
+
+- **Issue**: In `src/parser/schemaParser.ts`, regex patterns for `CREATE TABLE`, `ALTER TABLE`, and `CREATE INDEX` only matched unqualified identifiers, causing schema-qualified names (e.g. `CREATE TABLE public.users (...)` or `CREATE TABLE "app"."orders" (...)`) to fail parsing.
+- **Fix**: Updated table name regexes with optional schema prefix capture `(?:["`']?([a-zA-Z0-9_]+)["`']?\.)?["`']?([a-zA-Z0-9_]+)["`']?`.
+- **Files Modified**:
+  - `src/parser/schemaParser.ts`
+  - `tests/schemaParser.test.ts`
+
+---
+
+## 2. OutputNode Expression and Alias Fallback
+
+- **Issue**: In `src/graph/nodes/OutputNode.tsx`, projections without a `raw` property rendered blank lines instead of the column expression or alias.
+- **Fix**: Added fallback to `p.raw || (p.alias ? `${p.expression} AS ${p.alias}` : p.expression) || '*'`.
+- **Files Modified**:
+  - `src/graph/nodes/OutputNode.tsx`
+
+---
+
+## 3. AggregateNode Grouping Keys Fallback
+
+- **Issue**: In `src/graph/nodes/AggregateNode.tsx`, empty or omitted `raw` properties displayed blank snippet blocks.
+- **Fix**: Added fallback to `aggData.raw || aggData.columns?.join(', ') || 'ALL'`.
+- **Files Modified**:
+  - `src/graph/nodes/AggregateNode.tsx`
+
+---
+
+## 4. FilterNode Code Snippet Fallback
+
+- **Issue**: In `src/graph/nodes/FilterNode.tsx`, missing `raw` filter text left the snippet area empty.
+- **Fix**: Added fallback to `filterData.raw || (filterData.columns?.length ? filterData.columns.join(' AND ') : 'Condition')`.
+- **Files Modified**:
+  - `src/graph/nodes/FilterNode.tsx`
+
+---
+
+## 5. SortLimitNode Empty State Feedback
+
+- **Issue**: In `src/graph/nodes/SortLimitNode.tsx`, if both `orderBy` and `limit` were empty, the card body was blank.
+- **Fix**: Added a fallback message: "Natural order, no limit".
+- **Files Modified**:
+  - `src/graph/nodes/SortLimitNode.tsx`
+
+---
+
+## 6. Circular AST JSON Stringifier Protection
 
 - **Issue**: In `src/parser/queryAnalyzer.ts`, `exprToString()` called `JSON.stringify(expr)` directly on unrecognized nodes, throwing `TypeError: Converting circular structure to JSON` if AST structures contained circular parent references.
 - **Fix**: Wrapped `JSON.stringify(expr)` with a `try/catch` block that falls back to `String(expr)`.
@@ -10,7 +56,7 @@
 
 ---
 
-## 2. MySQL Comma-Separated LIMIT/OFFSET Extraction
+## 7. MySQL Comma-Separated LIMIT/OFFSET Extraction
 
 - **Issue**: In `src/parser/queryAnalyzer.ts`, MySQL queries using `LIMIT offset, count` syntax (e.g. `LIMIT 10, 20`) swapped the limit count and offset values because the parser stored offset in the first position.
 - **Fix**: Checked `separator === ','` to assign the first value to `offset` and the second value to `count`.
@@ -20,7 +66,7 @@
 
 ---
 
-## 3. Empty usingColumns Array Guard in Query Analyzer
+## 8. Empty usingColumns Array Guard in Query Analyzer
 
 - **Issue**: In `src/parser/queryAnalyzer.ts`, `usingCols` evaluated to `[]` when `item.using` had zero elements, incorrectly satisfying truthy checks and suppressing Cartesian join warnings.
 - **Fix**: Guarded with `Array.isArray(item.using) && item.using.length > 0`.
@@ -29,7 +75,7 @@
 
 ---
 
-## 4. Semantic Color-Coded Minimap Navigation
+## 9. Semantic Color-Coded Minimap Navigation
 
 - **Issue**: React Flow minimaps in `QueryFlowCanvas.tsx` and `SchemaFlowCanvas.tsx` rendered monochrome rectangles for all nodes, making visual orientation difficult.
 - **Fix**: Added dynamic `nodeColor` handlers in `QueryFlowCanvas.tsx` and `SchemaFlowCanvas.tsx` that map node types to distinct colors (Blue: Tables, Purple: Joins, Amber: Filters / Orphans, Cyan: Aggregations, Magenta: Sorting, Green: Output, Violet: CTEs).
@@ -39,7 +85,7 @@
 
 ---
 
-## 5. SVG AnimatedString Class Filter in PNG Export
+## 10. SVG AnimatedString Class Filter in PNG Export
 
 - **Issue**: In `src/graph/export.ts`, `node.className` for SVG nodes was an `SVGAnimatedString` object instead of a string, which prevented the filter from properly evaluating class names and excluding the minimap.
 - **Fix**: Extracted `.baseVal` when `className` is an SVG object and excluded both `react-flow__controls` and `react-flow__minimap`.
@@ -48,7 +94,7 @@
 
 ---
 
-## 6. JSON Object Output Formatting in Results Table
+## 11. JSON Object Output Formatting in Results Table
 
 - **Issue**: In `src/ui/ResultsTable/ResultsTable.tsx`, queries returning JSON objects or arrays displayed the literal string `"[object Object]"` in table cells.
 - **Fix**: Formatted object and array values using `JSON.stringify(val)`.
@@ -58,7 +104,7 @@
 
 ---
 
-## 7. Editor jumpToLine Column Offset Normalization
+## 12. Editor jumpToLine Column Offset Normalization
 
 - **Issue**: In `src/ui/EditorPane/EditorPane.tsx`, `jumpToLine` subtracted 1 directly from `column`, causing negative target positions if `column === 0`.
 - **Fix**: Clamped `safeColumn = Math.max(1, column)`.
@@ -67,7 +113,7 @@
 
 ---
 
-## 8. Table Indexes Breakdown in Details Panel
+## 13. Table Indexes Breakdown in Details Panel
 
 - **Issue**: In `src/ui/DetailsPanel/DetailsPanel.tsx`, table details only displayed columns and relationships, omitting defined table indexes.
 - **Fix**: Rendered real table indexes, unique flags, and indexed column lists in the inspector drawer.
@@ -76,7 +122,7 @@
 
 ---
 
-## 9. Schema Mode Dynamic Masonry Table Placement
+## 14. Schema Mode Dynamic Masonry Table Placement
 
 - **Issue**: In `src/layout/schemaLayout.ts`, table cards were laid out on a fixed 340px grid, causing tables with more than 10 columns to vertically overlap downstream cards.
 - **Fix**: Replaced the fixed grid with dynamic column Y-offset tracking that calculates heights based on individual column counts.
@@ -85,7 +131,7 @@
 
 ---
 
-## 10. SQLite group_concat Dialect Misclassification
+## 15. SQLite group_concat Dialect Misclassification
 
 - **Issue**: In `src/parser/dialects.ts`, `group_concat(` was listed as an exclusive MySQL construct, causing standard SQLite queries with `group_concat` to be falsely detected as MySQL.
 - **Fix**: Removed `group_concat(` from MySQL-exclusive patterns.
@@ -95,7 +141,7 @@
 
 ---
 
-## 11. URL Hash State Type & Shape Guarding
+## 16. URL Hash State Type & Shape Guarding
 
 - **Issue**: In `src/share/urlState.ts`, decompression of malformed hashes could return primitives, arrays, or objects missing required query parameters.
 - **Fix**: Validated that the decoded JSON payload contains valid string properties before returning `AppUrlState`.
@@ -104,7 +150,7 @@
 
 ---
 
-## 12. Unique Key (UQ) Visual Badges on Table Cards
+## 17. Unique Key (UQ) Visual Badges on Table Cards
 
 - **Issue**: Columns marked as unique in table schemas had no visual identifier in `TableCardNode.tsx`.
 - **Fix**: Added cyan `UQ` badges for unique non-primary columns on table cards.
@@ -113,7 +159,7 @@
 
 ---
 
-## 13. JOIN USING Column Reference Extraction Bug
+## 18. JOIN USING Column Reference Extraction Bug
 
 - **Issue**: In `src/parser/queryAnalyzer.ts`, `item.using.map(String)` converted column reference AST objects into `'[object Object]'` instead of extracting the column name.
 - **Fix**: Updated extraction to resolve `column`, `value`, or `exprToString()` from AST objects.
@@ -123,7 +169,7 @@
 
 ---
 
-## 14. JoinNode Empty usingColumns False-Positive Guard
+## 19. JoinNode Empty usingColumns False-Positive Guard
 
 - **Issue**: In `src/graph/nodes/JoinNode.tsx`, `{joinData.usingColumns && ...}` evaluated to true on empty arrays (`[]`), rendering `USING ()` and masking Cartesian product warnings.
 - **Fix**: Guarded with `joinData.usingColumns && joinData.usingColumns.length > 0`.
@@ -132,7 +178,7 @@
 
 ---
 
-## 15. ErrorBoundary Session Reset Recovery Option
+## 20. ErrorBoundary Session Reset Recovery Option
 
 - **Issue**: When an uncaught exception occurred (such as corrupted localStorage or malformed URL hashes), `ErrorBoundary.tsx` only provided a simple reload button, which could cause an infinite reload loop.
 - **Fix**: Added a secondary "Reset Session" button that clears URL hashes, resets theme storage, and restores default application state.
@@ -141,7 +187,7 @@
 
 ---
 
-## 16. CTESubgraphNode Target Handle for Chained Sub-Pipelines
+## 21. CTESubgraphNode Target Handle for Chained Sub-Pipelines
 
 - **Issue**: `CTESubgraphNode.tsx` only provided a source handle, preventing visual chaining between upstream and downstream CTE blocks.
 - **Fix**: Added target `<Handle>` to `CTESubgraphNode.tsx`.
@@ -150,7 +196,7 @@
 
 ---
 
-## 17. Help Dialog Keyboard Dismissal on Escape
+## 22. Help Dialog Keyboard Dismissal on Escape
 
 - **Issue**: The Help & Keyboard Shortcuts modal in `TopNav.tsx` had no keyboard listener, requiring users to manually click the backdrop or close button to dismiss it.
 - **Fix**: Added a dedicated `useEffect` listener to dismiss the modal when pressing the `Escape` key.
@@ -159,7 +205,7 @@
 
 ---
 
-## 18. Window Resize Diagram Auto-Fit
+## 23. Window Resize Diagram Auto-Fit
 
 - **Issue**: When resizing the browser window, toggling fullscreen, or docking browser developer tools, `QueryFlowCanvas.tsx` and `SchemaFlowCanvas.tsx` did not adjust their viewports, causing graphs to be off-center or clipped.
 - **Fix**: Added a window `resize` event listener with debounced `fitView` centering.
@@ -169,7 +215,7 @@
 
 ---
 
-## 19. Query Diagnostics for Random Sorting & Redundant Distinct
+## 24. Query Diagnostics for Random Sorting & Redundant Distinct
 
 - **Issue**: `ORDER BY RANDOM()` and `SELECT DISTINCT` combined with `GROUP BY` were not flagged in the query analyzer, missing critical performance diagnostic warnings.
 - **Fix**: Added performance rules for random sorting (`ORDER BY RAND() / RANDOM()`) and redundant `SELECT DISTINCT ... GROUP BY`.
@@ -179,7 +225,7 @@
 
 ---
 
-## 20. TableNode Target Handle for CTE Ingress Connections
+## 25. TableNode Target Handle for CTE Ingress Connections
 
 - **Issue**: `TableNode.tsx` only defined a right source handle, preventing incoming edges from Common Table Expressions (CTEs) or subqueries from docking on the left of table nodes.
 - **Fix**: Added target `<Handle>` component on the left side of `TableNode.tsx`.
@@ -188,7 +234,7 @@
 
 ---
 
-## 21. Diagnostics Bar Line 0 Rendering Bug
+## 26. Diagnostics Bar Line 0 Rendering Bug
 
 - **Issue**: In `DiagnosticsBar.tsx`, `{d.line && <span className={styles.badge}>Line {d.line}</span>}` rendered the raw number `0` in the DOM when `d.line === 0`.
 - **Fix**: Added a strict guard `{typeof d.line === 'number' && d.line > 0 && ...}`.
@@ -197,7 +243,7 @@
 
 ---
 
-## 22. Results Table CSV Export Type Serialization
+## 27. Results Table CSV Export Type Serialization
 
 - **Issue**: Boolean, null, and object values in query results were serialized as unquoted or poorly formatted string representations in `generateCsv()`.
 - **Fix**: Added type-aware CSV serialization handling numbers, `TRUE`/`FALSE` booleans, escaped JSON objects, and empty null cells.
@@ -207,7 +253,7 @@
 
 ---
 
-## 23. Concurrent SqlEngineClient Initialization Race Condition
+## 28. Concurrent SqlEngineClient Initialization Race Condition
 
 - **Issue**: `SqlEngineClient.init()` lacked initialization promise caching, causing concurrent callers during startup or database switching to instantiate multiple Web Workers and overwrite pending request maps.
 - **Fix**: Cached `initPromise` until initialization resolves, ensuring all concurrent callers await the same Web Worker instance.
@@ -216,7 +262,7 @@
 
 ---
 
-## 24. Stale Callback Closure in CodeMirror Keymaps
+## 29. Stale Callback Closure in CodeMirror Keymaps
 
 - **Issue**: `Mod-Enter` (`onRunQuery`) and `updateListener` (`onChange`) in `EditorPane.tsx` captured initial closures from `useEffect(..., [])`, invoking stale props when parent state updated.
 - **Fix**: Wrapped callbacks in mutable refs (`onRunQueryRef` and `onChangeRef`).
@@ -225,7 +271,7 @@
 
 ---
 
-## 25. URL Hash State Hydration Flash
+## 30. URL Hash State Hydration Flash
 
 - **Issue**: `selectedDbId`, `sqlQuery`, and `mode` initialized with hardcoded defaults before reading the URL hash, causing a brief flash and state replacement.
 - **Fix**: Lazily initialized state from `decodeStateFromHash(window.location.hash)`.
@@ -234,7 +280,7 @@
 
 ---
 
-## 26. Cursor Position Reset on SQL Formatter
+## 31. Cursor Position Reset on SQL Formatter
 
 - **Issue**: Running the format action in `EditorPane.tsx` dispatched document changes without preserving selection, resetting the cursor to index 0.
 - **Fix**: Preserved the main selection head offset during dispatch and clamped to the formatted document length.
@@ -243,7 +289,7 @@
 
 ---
 
-## 27. Handle ID Collisions in React Flow Schema Cards
+## 32. Handle ID Collisions in React Flow Schema Cards
 
 - **Issue**: Source and target handles on each column row shared the same identifier string (`${table.name}_${col.name}`), causing handle registry collisions and incorrect edge routing in React Flow.
 - **Fix**: Suffix target handle IDs with `_target` and source handle IDs with `_source`. Updated `src/layout/schemaLayout.ts` to reference `sourceHandle: ${fk.fromTable}_${fk.fromColumn}_source` and `targetHandle: ${fk.toTable}_${fk.toColumn}_target`.
@@ -253,7 +299,7 @@
 
 ---
 
-## 28. Schema Parser Multi-Word Data Types
+## 33. Schema Parser Multi-Word Data Types
 
 - **Issue**: The column definition regex in `src/parser/schemaParser.ts` truncated multi-word SQL data types (such as `DOUBLE PRECISION`, `INT UNSIGNED`, `CHARACTER VARYING(500)`), causing the second word to be treated as a column constraint.
 - **Fix**: Replaced regex matching with keyword boundary scanning that separates the column data type from constraint keywords (`PRIMARY KEY`, `NOT NULL`, `DEFAULT`, `REFERENCES`, `CHECK`).
@@ -263,7 +309,7 @@
 
 ---
 
-## 29. Stale Error State on Database and Sample Selection
+## 34. Stale Error State on Database and Sample Selection
 
 - **Issue**: When an invalid query triggered an execution error in `App.tsx`, selecting a new sample query or changing databases cleared `queryResult` but left `executionError` intact, preventing automatic execution of clean sample queries.
 - **Fix**: Cleared `setExecutionError(null)` in `handleDbChange` and `handleSelectSample`.
@@ -272,7 +318,7 @@
 
 ---
 
-## 30. Theme Mismatch in Graph PNG Export
+## 35. Theme Mismatch in Graph PNG Export
 
 - **Issue**: `src/graph/export.ts` hardcoded `#0f141c` as the PNG canvas background color, creating dark backgrounds for diagrams exported during light mode.
 - **Fix**: Dynamically resolve the computed value of CSS variable `--bg-primary` before generating image export.
@@ -281,7 +327,7 @@
 
 ---
 
-## 31. Resilient URL Hash State Decoding
+## 36. Resilient URL Hash State Decoding
 
 - **Issue**: URL hashes modified by browser encoding (e.g. percent-encoding) failed to decompress in `src/share/urlState.ts`.
 - **Fix**: Added sanitization and fallback decoding with `decodeURIComponent` before decompression.
@@ -291,7 +337,7 @@
 
 ---
 
-## 32. SQLite Foreign Key Null Target Column Resolution
+## 37. SQLite Foreign Key Null Target Column Resolution
 
 - **Issue**: When a SQLite foreign key referenced a table's primary key without an explicit column name, `PRAGMA foreign_key_list` returned null for the target column, resulting in the literal string `"null"` and broken edge connections.
 - **Fix**: Added fallback to default primary key column name (`'id'`) when `fkRow[4]` is null or empty.
@@ -300,7 +346,7 @@
 
 ---
 
-## 33. Web Worker SQLite Index Extraction & Missing FK Index Warnings
+## 38. Web Worker SQLite Index Extraction & Missing FK Index Warnings
 
 - **Issue**: `GET_SCHEMA` in `src/engine/worker.ts` never queried `PRAGMA index_list` or `PRAGMA index_info`, leaving table indexes empty and missing index diagnostics unpopulated.
 - **Fix**: Extracted real indexes via `PRAGMA index_list` and `PRAGMA index_info` per table and computed missing index warnings for foreign key columns.
@@ -309,7 +355,7 @@
 
 ---
 
-## 34. CTE Flow Edges in Query Graph
+## 39. CTE Flow Edges in Query Graph
 
 - **Issue**: CTE nodes were rendered on the canvas but had no outgoing edges connecting them to the downstream table source nodes referencing that CTE.
 - **Fix**: Added directed flow edges from CTE nodes to matching source table nodes in `src/layout/queryLayout.ts`.
@@ -319,7 +365,7 @@
 
 ---
 
-## 35. CTE Node Inspector in DetailsPanel
+## 40. CTE Node Inspector in DetailsPanel
 
 - **Issue**: Clicking on a CTE node in the query flow graph showed an empty inspector state.
 - **Fix**: Added dedicated CTE node inspection displaying the CTE name, source tables, projections, and AST details.
@@ -328,7 +374,7 @@
 
 ---
 
-## 36. Zero-Column Query Feedback in Results Table
+## 41. Zero-Column Query Feedback in Results Table
 
 - **Issue**: When a query returned zero columns (e.g. DDL / DML commands), `ResultsTable.tsx` displayed the placeholder message "Execute query (Ctrl+Enter) to view results table".
 - **Fix**: Added a success state that displays execution time and zero row feedback for non-result queries.
@@ -339,33 +385,36 @@
 
 ## UI/UX Enhancements Added
 
-1. **Semantic Color-Coded Minimap Navigation**: Minimap displays distinctive colors per node type (Blue for Tables, Purple for Joins, Amber for Filters, Cyan for Aggregations, Magenta for Sorting, Green for Output, Violet for CTEs).
-2. **Schema Flow Color-Coded Minimap**: Schema minimap highlights connected tables in blue and orphan tables in amber.
-3. **MySQL Comma-Limit Support**: Correctly splits and displays limit count vs offset count when inspecting queries using MySQL `LIMIT offset, count` syntax.
-4. **Clean Graph PNG Export**: PNG exports omit UI overlay controls and minimap while preserving full diagram resolution.
-5. **JSON Output Formatter in Results**: JSON objects and arrays format cleanly in results table cells.
-6. **Table Index Inspector**: Full inspection for table indexes, uniqueness flags, and column lists in the table inspector drawer.
-7. **Overlap-Free Masonry Schema Layout**: Table cards in Schema Mode are placed in dynamic vertical columns that prevent tall tables from colliding.
-8. **Visual Unique Constraint Badges (UQ)**: Schema cards highlight unique keys with cyan `UQ` badges.
-9. **Session Reset Option in Error Boundary**: Recovery button allows users to reset broken state or corrupted hash parameters.
-10. **Chained CTE Ingress Ports**: Visual connection ports allow chaining between sub-pipelines.
-11. **Modal Keyboard Dismissal**: Pressing `Escape` closes the Help and Keyboard Shortcuts modal from anywhere in the app.
-12. **Dynamic Canvas Auto-Centering**: Resizing the window or toggling full screen automatically triggers a smooth graph re-center.
-13. **Advanced Performance Diagnostics**: Visual diagnostics warn about `ORDER BY RANDOM()` and redundant `DISTINCT` + `GROUP BY` patterns.
-14. **Target Handle Docking on Table Nodes**: Visual connections from CTEs and subqueries dock directly into source table cards.
-15. **Query Clear & Reset Button**: Dedicated Clear button in `EditorPane.tsx` to clear editor queries with one click.
-16. **Global Escape Key Dismissal**: `Escape` key listener in `src/App.tsx` to dismiss open node inspection drawers.
-17. **Cursor-Preserving Formatter**: Formatter maintains cursor and line position during keyword formatting.
-18. **Interactive Table Filter in Schema Explorer**: Real-time table search input in `SchemaFlowCanvas.tsx` to highlight matching tables and dim non-matching tables.
-19. **Download CSV & Page Size Controls**: "Download CSV" file export button and a page size selector (10, 25, 50, 100 rows per page) in `ResultsTable.tsx`.
-20. **Active Sort Direction Indicators**: Ascending (`ArrowUp`), descending (`ArrowDown`), and unsorted (`ArrowUpDown`) icons in results table headers.
-21. **Keyboard Shortcuts & Help Dialog**: Help modal in `TopNav.tsx` detailing key shortcuts (`Ctrl+Enter` to run, `Ctrl+Space` for autocomplete, node click inspection).
-22. **Dedicated Sort & Limit Inspector**: Full inspection for `ORDER BY` directions and `LIMIT / OFFSET` numbers in `DetailsPanel.tsx`.
+1. **Schema-Qualified Table Explorer**: Full support for schema-qualified table names (`public.users`, `"app"."orders"`) across schema graph rendering and details inspection.
+2. **Robust Node Expression Display**: Graph cards for Aggregate, Filter, Output, and Sort/Limit nodes display formatted expressions and clear fallback states.
+3. **Semantic Color-Coded Minimap Navigation**: Minimap displays distinctive colors per node type (Blue for Tables, Purple for Joins, Amber for Filters, Cyan for Aggregations, Magenta for Sorting, Green for Output, Violet for CTEs).
+4. **Schema Flow Color-Coded Minimap**: Schema minimap highlights connected tables in blue and orphan tables in amber.
+5. **MySQL Comma-Limit Support**: Correctly splits and displays limit count vs offset count when inspecting queries using MySQL `LIMIT offset, count` syntax.
+6. **Clean Graph PNG Export**: PNG exports omit UI overlay controls and minimap while preserving full diagram resolution.
+7. **JSON Output Formatter in Results**: JSON objects and arrays format cleanly in results table cells.
+8. **Table Index Inspector**: Full inspection for table indexes, uniqueness flags, and column lists in the table inspector drawer.
+9. **Overlap-Free Masonry Schema Layout**: Table cards in Schema Mode are placed in dynamic vertical columns that prevent tall tables from colliding.
+10. **Visual Unique Constraint Badges (UQ)**: Schema cards highlight unique keys with cyan `UQ` badges.
+11. **Session Reset Option in Error Boundary**: Recovery button allows users to reset broken state or corrupted hash parameters.
+12. **Chained CTE Ingress Ports**: Visual connection ports allow chaining between sub-pipelines.
+13. **Modal Keyboard Dismissal**: Pressing `Escape` closes the Help and Keyboard Shortcuts modal from anywhere in the app.
+14. **Dynamic Canvas Auto-Centering**: Resizing the window or toggling full screen automatically triggers a smooth graph re-center.
+15. **Advanced Performance Diagnostics**: Visual diagnostics warn about `ORDER BY RANDOM()` and redundant `DISTINCT` + `GROUP BY` patterns.
+16. **Target Handle Docking on Table Nodes**: Visual connections from CTEs and subqueries dock directly into source table cards.
+17. **Query Clear & Reset Button**: Dedicated Clear button in `EditorPane.tsx` to clear editor queries with one click.
+18. **Global Escape Key Dismissal**: `Escape` key listener in `src/App.tsx` to dismiss open node inspection drawers.
+19. **Cursor-Preserving Formatter**: Formatter maintains cursor and line position during keyword formatting.
+20. **Interactive Table Filter in Schema Explorer**: Real-time table search input in `SchemaFlowCanvas.tsx` to highlight matching tables and dim non-matching tables.
+21. **Download CSV & Page Size Controls**: "Download CSV" file export button and a page size selector (10, 25, 50, 100 rows per page) in `ResultsTable.tsx`.
+22. **Active Sort Direction Indicators**: Ascending (`ArrowUp`), descending (`ArrowDown`), and unsorted (`ArrowUpDown`) icons in results table headers.
+23. **Keyboard Shortcuts & Help Dialog**: Help modal in `TopNav.tsx` detailing key shortcuts (`Ctrl+Enter` to run, `Ctrl+Space` for autocomplete, node click inspection).
+24. **Dedicated Sort & Limit Inspector**: Full inspection for `ORDER BY` directions and `LIMIT / OFFSET` numbers in `DetailsPanel.tsx`.
 
 ---
 
-## Expanded Test Coverage (11 Test Suites, 51 Tests)
+## Expanded Test Coverage (11 Test Suites, 52 Tests)
 
+- `tests/schemaParser.test.ts`: Multi-word data types, composite primary keys, foreign keys, missing indexes, schema-qualified table names.
 - `tests/parser.test.ts`: Query parsing, USING clauses, multiple CTEs, comments handling, empty query handling, circular AST protection, and AST models.
 - `tests/queryAnalyzer.test.ts`: AST analysis for CTEs, joins, aggregations, subqueries in FROM, order by, MySQL comma limit/offset.
 - `tests/export.test.ts`: CSV generator logic with nulls, booleans, objects, quotes, and zero-column edge cases.
@@ -374,6 +423,5 @@
 - `tests/databaseCatalog.test.ts`: Verifies all 23 database sample queries parse without syntax errors.
 - `tests/theme.test.ts`: Validates light and dark theme palettes, contrast, and CSS variables.
 - `tests/schemaLayout.test.ts`: Graph layout, distinct handle IDs, orphan tables.
-- `tests/schemaParser.test.ts`: Multi-word data types, composite primary keys, foreign keys, missing indexes.
 - `tests/urlState.test.ts`: Codec encoding, hash prefixes, corruption handling.
 - `tests/queryLayout.test.ts`: Query flow DAG layout, CTE connections, dual table support.

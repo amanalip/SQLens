@@ -22,21 +22,25 @@ export function parseSchemaSQL(sql: string): SchemaModel {
     .filter(Boolean);
 
   for (const stmt of statements) {
-    // CREATE TABLE matching
-    const createTableMatch = stmt.match(/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?["`']?([a-zA-Z0-9_]+)["`']?\s*\(([\s\S]+)\)/i);
+    // CREATE TABLE matching with optional schema qualification (e.g. public.users)
+    const createTableMatch = stmt.match(/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?(?:["`']?([a-zA-Z0-9_]+)["`']?\.)?["`']?([a-zA-Z0-9_]+)["`']?\s*\(([\s\S]+)\)/i);
     if (createTableMatch) {
-      const tableName = createTableMatch[1];
-      const body = createTableMatch[2];
+      const tableName = createTableMatch[2] || createTableMatch[1];
+      const body = createTableMatch[3];
       const table = parseTableDefinition(tableName, body);
       tables[tableName] = table;
       foreignKeys.push(...table.foreignKeys);
       continue;
     }
 
-    // ALTER TABLE ADD CONSTRAINT / FOREIGN KEY matching
-    const alterFkMatch = stmt.match(/ALTER\s+TABLE\s+["`']?([a-zA-Z0-9_]+)["`']?\s+ADD\s+(?:CONSTRAINT\s+["`']?([a-zA-Z0-9_]+)["`']?\s+)?FOREIGN\s+KEY\s*\(\s*["`']?([a-zA-Z0-9_]+)["`']?\s*\)\s*REFERENCES\s+["`']?([a-zA-Z0-9_]+)["`']?\s*\(\s*["`']?([a-zA-Z0-9_]+)["`']?\s*\)/i);
+    // ALTER TABLE ADD CONSTRAINT / FOREIGN KEY matching with optional schema qualification
+    const alterFkMatch = stmt.match(/ALTER\s+TABLE\s+(?:["`']?([a-zA-Z0-9_]+)["`']?\.)?["`']?([a-zA-Z0-9_]+)["`']?\s+ADD\s+(?:CONSTRAINT\s+["`']?([a-zA-Z0-9_]+)["`']?\s+)?FOREIGN\s+KEY\s*\(\s*["`']?([a-zA-Z0-9_]+)["`']?\s*\)\s*REFERENCES\s+(?:["`']?([a-zA-Z0-9_]+)["`']?\.)?["`']?([a-zA-Z0-9_]+)["`']?\s*\(\s*["`']?([a-zA-Z0-9_]+)["`']?\s*\)/i);
     if (alterFkMatch) {
-      const [, fromTable, constraintName, fromCol, toTable, toCol] = alterFkMatch;
+      const fromTable = alterFkMatch[2] || alterFkMatch[1];
+      const constraintName = alterFkMatch[3];
+      const fromCol = alterFkMatch[4];
+      const toTable = alterFkMatch[6] || alterFkMatch[5];
+      const toCol = alterFkMatch[7];
       const fk: ForeignKeyReference = {
         id: `fk_${fromTable}_${fromCol}_${toTable}_${toCol}`,
         fromTable,
@@ -57,13 +61,13 @@ export function parseSchemaSQL(sql: string): SchemaModel {
       continue;
     }
 
-    // CREATE [UNIQUE] INDEX matching
-    const indexMatch = stmt.match(/CREATE\s+(UNIQUE\s+)?INDEX\s+(?:IF\s+NOT\s+EXISTS\s+)?["`']?([a-zA-Z0-9_]+)["`']?\s+ON\s+["`']?([a-zA-Z0-9_]+)["`']?\s*\(([\s\S]+?)\)/i);
+    // CREATE [UNIQUE] INDEX matching with optional schema qualification
+    const indexMatch = stmt.match(/CREATE\s+(UNIQUE\s+)?INDEX\s+(?:IF\s+NOT\s+EXISTS\s+)?["`']?([a-zA-Z0-9_]+)["`']?\s+ON\s+(?:["`']?([a-zA-Z0-9_]+)["`']?\.)?["`']?([a-zA-Z0-9_]+)["`']?\s*\(([\s\S]+?)\)/i);
     if (indexMatch) {
       const isUnique = Boolean(indexMatch[1]);
       const indexName = indexMatch[2];
-      const indexedTable = indexMatch[3];
-      const colList = indexMatch[4]
+      const indexedTable = indexMatch[4] || indexMatch[3];
+      const colList = indexMatch[5]
         .split(',')
         .map((c) => c.trim().replace(/["`']/g, '').split(/\s+/)[0])
         .filter(Boolean);

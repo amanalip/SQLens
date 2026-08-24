@@ -28,7 +28,7 @@ export const AggregateNode: React.FC<NodeProps> = ({ data, selected }) => {
       </div>
       <div className={styles.nodeBody}>
         <div>Group keys:</div>
-        <div className={styles.codeSnippet}>{aggData.raw}</div>
+        <div className={styles.codeSnippet}>{aggData.raw || aggData.columns?.join(', ') || 'ALL'}</div>
       </div>
       <Handle type="source" position={Position.Right} style={{ background: '#ec4899' }} />
     </div>

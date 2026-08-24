@@ -46,7 +46,9 @@ export const OutputNode: React.FC<NodeProps> = ({ data, selected }) => {
         )}
         <div className={styles.codeSnippet}>
           {outputData.projections.length > 0
-            ? outputData.projections.map((p) => p.raw).join('\n')
+            ? outputData.projections
+                .map((p) => p.raw || (p.alias ? `${p.expr} AS ${p.alias}` : p.expr) || '*')
+                .join('\n')
             : '*'}
         </div>
       </div>

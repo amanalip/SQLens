@@ -28,6 +28,9 @@ export const SortLimitNode: React.FC<NodeProps> = ({ data, selected }) => {
         </span>
       </div>
       <div className={styles.nodeBody}>
+        {sortData.orderBy.length === 0 && !sortData.limit && (
+          <div className={styles.codeSnippet}>Natural order, no limit</div>
+        )}
         {sortData.orderBy.length > 0 && (
           <div>
             <div>Sort:</div>
