@@ -13,7 +13,7 @@ The application runs entirely client-side as a static web app. Query execution i
 - **Query Flow DAG**: Transforms SQL queries into visual data flow graphs showing table sources, joins, filters, aggregates, groupings, sorting, and output projections.
 - **Schema Explorer (ER Diagrams)**: Renders entity-relationship diagrams from database schemas with primary keys, foreign keys, and relationship links.
 - **In-Browser SQLite Playground**: Runs real queries in a background Web Worker without blocking the main UI thread.
-- **Bundled Public Databases**: Pre-loaded SQLite databases (Chinook, Northwind, Sakila, World, Employees) with curated sample queries.
+- **13 Bundled Public Databases**: Pre-loaded SQLite datasets with curated educational queries.
 - **CodeMirror 6 Editor**: SQL syntax highlighting, bracket matching, schema-aware autocomplete for tables and columns, and `Ctrl+Enter` execution.
 - **Diagnostics**: Real-time syntax and structural query warnings with click-to-jump line navigation.
 - **Sharing & Export**: URL state compression via LZ-string to share queries, plus PNG export for graph diagrams and CSV export for results.
@@ -30,6 +30,14 @@ The application runs entirely client-side as a static web app. Query execution i
 | **Sakila** | DVD rental store (films, actors, rentals) | ~2 MB | Self-joins, date filtering |
 | **World** | Geographic demographic data | ~400 KB | Basic filters, aggregation |
 | **Employees** | Enterprise staff records (departments, titles) | ~500 KB | CTEs, window calculations |
+| **Formula 1** | F1 championship (races, drivers, circuits) | ~1.5 MB | Ranking, analytics, points calculation |
+| **Classicmodels** | Scale models retailer (products, sales, orders) | ~1 MB | Sales reporting, balances, hierarchies |
+| **IMDb Movies** | Film catalog (movies, directors, cast) | ~1 MB | Text search, rating averages |
+| **Spotify Music** | Track audio metrics (danceability, energy) | ~1 MB | CASE classification, audio averages |
+| **Pokemon** | Species, combat stats, elemental types | ~500 KB | Stat totals, type groupings |
+| **University** | Student enrollment and course catalog | ~500 KB | Transcripts, class size CTEs |
+| **Premier League** | Football matches, standings, goal scorers | ~1 MB | Table standings calculation, points CTE |
+| **E-Commerce** | Online orders, product categories, reviews | ~1.5 MB | Review averages, seller performance |
 
 ---
 
