@@ -50,6 +50,16 @@ export function parseSQL(sql: string, userDialect?: SQLDialect): ParseResult {
     const model = analyzeAst(singleAst, trimmed);
 
     // Diagnostics checks
+    if ((model.queryType === 'DELETE' || model.queryType === 'UPDATE') && model.filters.length === 0) {
+      diagnostics.push({
+        id: 'unbounded-mutation',
+        message: `${model.queryType} statement lacks a WHERE clause and will affect every row in the table.`,
+        severity: 'warning',
+        ruleId: 'require-where-mutation',
+        suggestion: 'Add a WHERE clause to constrain the target rows',
+      });
+    }
+
     if (model.hasStarProjection) {
       diagnostics.push({
         id: 'star-projection',
@@ -76,6 +86,16 @@ export function parseSQL(sql: string, userDialect?: SQLDialect): ParseResult {
         message: 'Correlated subquery found. This may execute once per outer row.',
         severity: 'info',
         ruleId: 'correlated-subquery',
+      });
+    }
+
+    if (/LIKE\s+['"]%[^'"]+['"]/i.test(trimmed)) {
+      diagnostics.push({
+        id: 'leading-wildcard-like',
+        message: 'Leading wildcard in LIKE clause (%...) prevents index lookups and causes full table scans.',
+        severity: 'info',
+        ruleId: 'no-leading-wildcard',
+        suggestion: 'Consider full-text search or prefix matching if performance is critical',
       });
     }
 

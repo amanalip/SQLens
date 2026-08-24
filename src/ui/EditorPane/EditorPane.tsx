@@ -234,15 +234,40 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
       const view = editorViewRef.current;
       if (!view) return;
       const sqlText = view.state.doc.toString();
-      // Basic standard formatting indentation
-      const formatted = sqlText
-        .replace(/\b(SELECT|FROM|WHERE|GROUP BY|HAVING|ORDER BY|LIMIT|JOIN|LEFT JOIN|RIGHT JOIN|INNER JOIN|WITH)\b/gi, '\n$1')
-        .replace(/\s+/g, ' ')
-        .replace(/\n\s+/g, '\n')
-        .trim();
+      if (!sqlText.trim()) return;
+
+      const keywords = [
+        'SELECT', 'FROM', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY',
+        'LIMIT', 'OFFSET', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN',
+        'FULL JOIN', 'CROSS JOIN', 'JOIN', 'ON', 'AND', 'OR', 'UNION ALL',
+        'UNION', 'WITH', 'INSERT INTO', 'VALUES', 'UPDATE', 'SET', 'DELETE FROM',
+        'AS', 'DISTINCT', 'COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END'
+      ];
+
+      let formatted = sqlText;
+
+      // Uppercase standard keywords
+      keywords.forEach((kw) => {
+        const regex = new RegExp(`\\b${kw}\\b`, 'gi');
+        formatted = formatted.replace(regex, kw);
+      });
+
+      // Insert clean clause newlines
+      const majorClauses = [
+        'SELECT', 'FROM', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY',
+        'LIMIT', 'OFFSET', 'INNER JOIN', 'LEFT JOIN', 'RIGHT JOIN',
+        'FULL JOIN', 'CROSS JOIN', 'UNION ALL', 'UNION', 'WITH', 'SET', 'VALUES'
+      ];
+
+      majorClauses.forEach((clause) => {
+        const regex = new RegExp(`\\s*\\b(${clause})\\b`, 'g');
+        formatted = formatted.replace(regex, '\n$1');
+      });
+
+      formatted = formatted.trim();
 
       view.dispatch({
-        changes: { from: 0, to: sqlText.length, insert: formatted },
+        changes: { from: 0, to: view.state.doc.length, insert: formatted },
       });
       onChange(formatted);
     };

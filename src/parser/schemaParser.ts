@@ -163,11 +163,25 @@ function parseTableDefinition(tableName: string, body: string): TableSchema {
     }
 
     // Column definition
-    const colMatch = trimmed.match(/^["`']?([a-zA-Z0-9_]+)["`']?\s+([a-zA-Z0-9_]+(?:\s*\([^)]*\))?)([\s\S]*)$/);
-    if (colMatch) {
-      const colName = colMatch[1];
-      const colType = colMatch[2];
-      const constraints = colMatch[3] || '';
+    const colNameMatch = trimmed.match(/^["`']?([a-zA-Z0-9_]+)["`']?\s+([\s\S]+)$/);
+    if (colNameMatch) {
+      const colName = colNameMatch[1];
+      const rest = colNameMatch[2].trim();
+
+      // Separate type from constraints
+      const constraintKeywords = /\b(PRIMARY\s+KEY|NOT\s+NULL|NULL|UNIQUE|DEFAULT|REFERENCES|CHECK|AUTO_INCREMENT|COLLATE|GENERATED)\b/i;
+      const constraintIdx = rest.search(constraintKeywords);
+
+      let colType = '';
+      let constraints = '';
+
+      if (constraintIdx !== -1) {
+        colType = rest.substring(0, constraintIdx).trim();
+        constraints = rest.substring(constraintIdx).trim();
+      } else {
+        colType = rest;
+        constraints = '';
+      }
 
       const isPk = /PRIMARY\s+KEY/i.test(constraints);
       const isNotNull = /NOT\s+NULL/i.test(constraints) || isPk;
@@ -196,7 +210,7 @@ function parseTableDefinition(tableName: string, body: string): TableSchema {
 
       columns.push({
         name: colName,
-        type: colType.toUpperCase(),
+        type: colType.toUpperCase() || 'TEXT',
         nullable: !isNotNull,
         isPrimaryKey: isPk,
         isForeignKey: Boolean(inlineRef),

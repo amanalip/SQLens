@@ -39,8 +39,8 @@ export const DiagnosticsBar: React.FC<DiagnosticsBarProps> = ({
             key={`${d.id}_${index}`}
             className={`${styles.item} ${itemClass}`}
             onClick={() => {
-              if (d.line && onJumpToLine) {
-                onJumpToLine(d.line, d.column);
+              if (typeof d.line === 'number' && onJumpToLine) {
+                onJumpToLine(Math.max(1, d.line), d.column);
               }
             }}
             title={d.suggestion || 'Click to jump to line in editor'}

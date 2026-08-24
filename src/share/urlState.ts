@@ -19,10 +19,22 @@ export function encodeStateToHash(state: AppUrlState): string {
 
 export function decodeStateFromHash(hash: string): AppUrlState | null {
   try {
-    const cleanHash = hash.startsWith('#') ? hash.slice(1) : hash;
+    let cleanHash = hash.startsWith('#') ? hash.slice(1) : hash;
+    cleanHash = cleanHash.trim();
     if (!cleanHash) return null;
 
-    const decompressed = LZString.decompressFromEncodedURIComponent(cleanHash);
+    let decompressed = LZString.decompressFromEncodedURIComponent(cleanHash);
+
+    // Fallback if hash was percent-encoded or pre-decoded
+    if (!decompressed) {
+      try {
+        const unescaped = decodeURIComponent(cleanHash);
+        decompressed = LZString.decompressFromEncodedURIComponent(unescaped);
+      } catch {
+        // Continue
+      }
+    }
+
     if (!decompressed) return null;
 
     return JSON.parse(decompressed) as AppUrlState;

@@ -74,9 +74,8 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
     },
   });
 
-  const handleCopyCsv = () => {
-    if (!result || result.columns.length === 0) return;
-
+  const generateCsv = (): string => {
+    if (!result || result.columns.length === 0) return '';
     const header = result.columns.map((c) => `"${c.replace(/"/g, '""')}"`).join(',');
     const rows = result.values
       .map((row) =>
@@ -89,11 +88,27 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
           .join(',')
       )
       .join('\n');
+    return `${header}\n${rows}`;
+  };
 
-    const csv = `${header}\n${rows}`;
+  const handleCopyCsv = () => {
+    const csv = generateCsv();
+    if (!csv) return;
     navigator.clipboard.writeText(csv);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleDownloadCsv = () => {
+    const csv = generateCsv();
+    if (!csv) return;
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `query-results-${Date.now()}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
   };
 
   if (error) {
@@ -110,7 +125,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
     );
   }
 
-  if (!result || result.columns.length === 0) {
+  if (!result) {
     return (
       <div className={styles.container}>
         <div className={styles.header}>
@@ -118,6 +133,25 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
         </div>
         <div className={styles.emptyState}>
           <div>Execute query (Ctrl+Enter) to view results table</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (result.columns.length === 0) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <div className={styles.statsGroup}>
+            <div className={styles.statItem}>
+              <Clock size={13} />
+              <span>Time:</span>
+              <span className={styles.statValue}>{result.executionTimeMs} ms</span>
+            </div>
+          </div>
+        </div>
+        <div className={styles.emptyState}>
+          <div>Query executed successfully. 0 rows returned.</div>
         </div>
       </div>
     );
@@ -140,9 +174,13 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
         </div>
 
         <div className={styles.actionsGroup}>
-          <button className={styles.csvButton} onClick={handleCopyCsv} title="Copy results as CSV">
+          <button className={styles.csvButton} onClick={handleCopyCsv} title="Copy results as CSV to clipboard">
             {copied ? <Check size={12} color="#10b981" /> : <Copy size={12} />}
             <span>{copied ? 'Copied' : 'Copy CSV'}</span>
+          </button>
+          <button className={styles.csvButton} onClick={handleDownloadCsv} title="Download results as a CSV file">
+            <Copy size={12} />
+            <span>Download CSV</span>
           </button>
         </div>
       </div>
@@ -181,16 +219,40 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
         </table>
       </div>
 
-      {table.getPageCount() > 1 && (
-        <div className={styles.pagination}>
+      <div className={styles.pagination}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <div>
-            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+            Page {table.getState().pagination.pageIndex + 1} of {Math.max(1, table.getPageCount())}
           </div>
+          <select
+            value={table.getState().pagination.pageSize}
+            onChange={(e) => table.setPageSize(Number(e.target.value))}
+            style={{
+              background: 'var(--bg-secondary, #161d27)',
+              color: 'var(--text-secondary, #9ca3af)',
+              border: '1px solid var(--border, #2a3649)',
+              borderRadius: 4,
+              fontSize: 11,
+              padding: '2px 6px',
+              outline: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            {[10, 25, 50, 100].map((size) => (
+              <option key={size} value={size}>
+                {size} rows / page
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {table.getPageCount() > 1 && (
           <div className={styles.paginationControls}>
             <button
               className={styles.pageButton}
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
+              title="First page"
             >
               <ChevronsLeft size={13} />
             </button>
@@ -198,6 +260,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
               className={styles.pageButton}
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
+              title="Previous page"
             >
               <ChevronLeft size={13} />
             </button>
@@ -205,6 +268,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
               className={styles.pageButton}
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
+              title="Next page"
             >
               <ChevronRight size={13} />
             </button>
@@ -212,12 +276,13 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
               className={styles.pageButton}
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
               disabled={!table.getCanNextPage()}
+              title="Last page"
             >
               <ChevronsRight size={13} />
             </button>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

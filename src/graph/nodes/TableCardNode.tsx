@@ -31,7 +31,7 @@ export const TableCardNode: React.FC<NodeProps> = ({ data, selected }) => {
               <Handle
                 type="target"
                 position={Position.Left}
-                id={handleId}
+                id={`${handleId}_target`}
                 style={{
                   top: '50%',
                   background: col.isPrimaryKey ? '#f59e0b' : '#3b82f6',
@@ -56,7 +56,7 @@ export const TableCardNode: React.FC<NodeProps> = ({ data, selected }) => {
               <Handle
                 type="source"
                 position={Position.Right}
-                id={handleId}
+                id={`${handleId}_source`}
                 style={{
                   top: '50%',
                   background: col.isPrimaryKey ? '#f59e0b' : '#3b82f6',

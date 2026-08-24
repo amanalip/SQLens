@@ -16,4 +16,21 @@ describe('URL State Codec', () => {
     const decoded = decodeStateFromHash(hash);
     expect(decoded).toEqual(original);
   });
+
+  it('decodes hash with leading hash symbol and whitespace', () => {
+    const original: AppUrlState = {
+      sql: 'SELECT 1;',
+      dbId: 'world',
+      mode: 'schema',
+    };
+    const hash = `#${encodeStateToHash(original)} `;
+    const decoded = decodeStateFromHash(hash);
+    expect(decoded).toEqual(original);
+  });
+
+  it('returns null for empty or corrupted hash', () => {
+    expect(decodeStateFromHash('')).toBeNull();
+    expect(decodeStateFromHash('#')).toBeNull();
+    expect(decodeStateFromHash('invalid_corrupted_hash_data_12345')).toBeNull();
+  });
 });

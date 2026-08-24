@@ -54,4 +54,28 @@ describe('Schema DDL Parser', () => {
     expect(schema.missingIndexFkColumns.length).toBe(1);
     expect(schema.missingIndexFkColumns[0]).toEqual({ table: 'books', column: 'author_id' });
   });
+
+  it('parses multi-word data types and composite primary keys', () => {
+    const ddl = `
+      CREATE TABLE financial_metrics (
+        company_id INTEGER NOT NULL,
+        metric_date TEXT NOT NULL,
+        price DOUBLE PRECISION NOT NULL,
+        shares INT UNSIGNED DEFAULT 0,
+        notes CHARACTER VARYING(500),
+        PRIMARY KEY (company_id, metric_date)
+      );
+      CREATE INDEX idx_metrics_date ON financial_metrics (metric_date);
+    `;
+
+    const schema = parseSchemaSQL(ddl);
+    const table = schema.tables['financial_metrics'];
+
+    expect(table).toBeDefined();
+    expect(table.primaryKey).toEqual(['company_id', 'metric_date']);
+    expect(table.columns.find((c) => c.name === 'price')?.type).toBe('DOUBLE PRECISION');
+    expect(table.columns.find((c) => c.name === 'shares')?.type).toBe('INT UNSIGNED');
+    expect(table.indexes.length).toBe(1);
+    expect(table.indexes[0].name).toBe('idx_metrics_date');
+  });
 });

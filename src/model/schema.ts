@@ -2,8 +2,8 @@ export interface ColumnSchema {
   name: string;
   type: string;
   nullable: boolean;
-  isPrimaryKey: boolean;
-  isForeignKey: boolean;
+  isPrimaryKey?: boolean;
+  isForeignKey?: boolean;
   isUnique?: boolean;
   defaultValue?: string;
   references?: {

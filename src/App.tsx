@@ -143,11 +143,13 @@ export function App() {
 
   const handleDbChange = (newDbId: string) => {
     setSelectedDbId(newDbId);
+    setQueryResult(null);
+    setExecutionError(null);
     loadDatabase(newDbId);
     const dbConfig = bundledDatabases.find((db) => db.id === newDbId);
     if (dbConfig && dbConfig.samples[0]) {
       setSqlQuery(dbConfig.samples[0].sql);
-      setQueryResult(null);
+      editorRef.current?.setValue(dbConfig.samples[0].sql);
     }
   };
 
@@ -155,6 +157,7 @@ export function App() {
     setSqlQuery(sample.sql);
     editorRef.current?.setValue(sample.sql);
     setQueryResult(null);
+    setExecutionError(null);
   };
 
   const handleShare = () => {

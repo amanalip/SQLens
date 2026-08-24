@@ -169,6 +169,33 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
           </div>
         )}
 
+        {type === 'sortLimitNode' && (
+          <div className={styles.section}>
+            <div className={styles.sectionTitle}>Ordering & Pagination</div>
+            {Array.isArray(data.orderBy) && (data.orderBy as Array<{ column: string; direction: string }>).length > 0 && (
+              <div style={{ marginBottom: 8 }}>
+                <span className={styles.propertyLabel}>ORDER BY:</span>
+                {(data.orderBy as Array<{ column: string; direction: string }>).map((o, idx) => (
+                  <div key={idx} className={styles.codeBlock}>
+                    {o.column} {o.direction}
+                  </div>
+                ))}
+              </div>
+            )}
+            {Boolean(data.limit) && (
+              <div className={styles.propertyRow}>
+                <span className={styles.propertyLabel}>LIMIT / OFFSET:</span>
+                <span className={styles.propertyValue}>
+                  {(data.limit as { count: number; offset?: number }).count}
+                  {(data.limit as { count: number; offset?: number }).offset !== undefined
+                    ? ` (Offset ${(data.limit as { count: number; offset?: number }).offset})`
+                    : ''}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
+
         {type === 'outputNode' && (
           <div className={styles.section}>
             <div className={styles.sectionTitle}>Selected Projections</div>

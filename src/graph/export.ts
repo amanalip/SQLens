@@ -2,8 +2,13 @@ import { toPng } from 'html-to-image';
 
 export async function exportGraphToPng(containerElement: HTMLElement, filename = 'sqlens-graph.png'): Promise<void> {
   try {
+    const computedBg =
+      getComputedStyle(containerElement).getPropertyValue('--bg-primary').trim() ||
+      getComputedStyle(document.documentElement).getPropertyValue('--bg-primary').trim() ||
+      '#0f141c';
+
     const dataUrl = await toPng(containerElement, {
-      backgroundColor: '#0f141c',
+      backgroundColor: computedBg,
       quality: 0.95,
       filter: (node) => {
         // Exclude minimap or controls from screenshot if needed

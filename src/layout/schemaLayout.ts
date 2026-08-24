@@ -50,8 +50,8 @@ export function buildSchemaGraph(schema: SchemaModel): SchemaLayoutResult {
         id: `fk_edge_${index}_${fk.fromTable}_${fk.toTable}`,
         source: sourceNodeId,
         target: targetNodeId,
-        sourceHandle: `${fk.fromTable}_${fk.fromColumn}`,
-        targetHandle: `${fk.toTable}_${fk.toColumn}`,
+        sourceHandle: `${fk.fromTable}_${fk.fromColumn}_source`,
+        targetHandle: `${fk.toTable}_${fk.toColumn}_target`,
         type: 'foreignKeyEdge',
         data: {
           fromCol: fk.fromColumn,
