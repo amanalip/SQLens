@@ -45,7 +45,7 @@ export function decodeStateFromHash(hash: string): AppUrlState | null {
 
     return {
       sql: typeof parsed.sql === 'string' ? parsed.sql : '',
-      dbId: typeof parsed.dbId === 'string' ? parsed.dbId : undefined,
+      dbId: typeof parsed.dbId === 'string' && parsed.dbId.trim().length > 0 ? parsed.dbId.trim() : undefined,
       mode: parsed.mode === 'schema' ? 'schema' : 'query',
     };
   } catch (err) {
