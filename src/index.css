@@ -41,3 +41,55 @@ html, body, #root {
 .react-flow__handle {
   border: 1px solid rgba(255, 255, 255, 0.4);
 }
+
+.react-flow__controls {
+  background: var(--bg-secondary, #161d27) !important;
+  border: 1px solid var(--border, #2a3649) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  overflow: hidden !important;
+}
+
+.react-flow__controls-button {
+  background: var(--bg-secondary, #161d27) !important;
+  border: none !important;
+  border-bottom: 1px solid var(--border, #2a3649) !important;
+  color: var(--text-primary, #f3f4f6) !important;
+  fill: var(--text-primary, #f3f4f6) !important;
+  width: 28px !important;
+  height: 28px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+}
+
+.react-flow__controls-button:last-child {
+  border-bottom: none !important;
+}
+
+.react-flow__controls-button:hover {
+  background: var(--bg-tertiary, #1f2937) !important;
+  color: var(--accent, #3b82f6) !important;
+  fill: var(--accent, #3b82f6) !important;
+}
+
+.react-flow__controls-button svg {
+  fill: currentColor !important;
+  stroke: currentColor !important;
+  max-width: 14px !important;
+  max-height: 14px !important;
+}
+
+.react-flow__controls-button path {
+  fill: currentColor !important;
+}
+
+.react-flow__minimap {
+  background: var(--bg-secondary, #161d27) !important;
+  border: 1px solid var(--border, #2a3649) !important;
+  border-radius: 6px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+  overflow: hidden !important;
+}
