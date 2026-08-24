@@ -155,7 +155,9 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
               <div className={styles.section}>
                 <div className={styles.sectionTitle}>CTE Projections</div>
                 <div className={styles.codeBlock}>
-                  {(data.model as { projections?: Array<{ raw: string }> }).projections?.map((p) => p.raw).join('\n') || '*'}
+                  {(data.model as { projections?: Array<{ raw?: string; expr?: string; alias?: string }> }).projections
+                    ?.map((p) => p.raw || (p.alias ? `${p.expr} AS ${p.alias}` : p.expr) || '*')
+                    .join('\n') || '*'}
                 </div>
               </div>
             )}
@@ -168,12 +170,18 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
               <div className={styles.sectionTitle}>Source Table</div>
               <div className={styles.propertyRow}>
                 <span className={styles.propertyLabel}>Table Name:</span>
-                <span className={styles.propertyValue}>{String(data.name)}</span>
+                <span className={styles.propertyValue}>{String(data.name || '')}</span>
               </div>
               {Boolean(data.alias) && (
                 <div className={styles.propertyRow}>
                   <span className={styles.propertyLabel}>Alias:</span>
                   <span className={styles.propertyValue}>{String(data.alias)}</span>
+                </div>
+              )}
+              {Boolean(data.schema) && (
+                <div className={styles.propertyRow}>
+                  <span className={styles.propertyLabel}>Schema:</span>
+                  <span className={styles.propertyValue}>{String(data.schema)}</span>
                 </div>
               )}
             </div>
@@ -186,17 +194,23 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
               <div className={styles.sectionTitle}>Join Operation</div>
               <div className={styles.propertyRow}>
                 <span className={styles.propertyLabel}>Type:</span>
-                <span className={styles.propertyValue}>{String(data.type)} JOIN</span>
+                <span className={styles.propertyValue}>{String(data.type || '')} JOIN</span>
               </div>
               <div className={styles.propertyRow}>
                 <span className={styles.propertyLabel}>Target Table:</span>
-                <span className={styles.propertyValue}>{String(data.rightTable)}</span>
+                <span className={styles.propertyValue}>{String(data.rightTable || '')}</span>
               </div>
             </div>
-            {data.onCondition && (
+            {Boolean(data.onCondition) && (
               <div className={styles.section}>
                 <div className={styles.sectionTitle}>Join Condition (ON)</div>
                 <div className={styles.codeBlock}>{String(data.onCondition)}</div>
+              </div>
+            )}
+            {Boolean(data.usingColumns && Array.isArray(data.usingColumns) && data.usingColumns.length > 0) && (
+              <div className={styles.section}>
+                <div className={styles.sectionTitle}>Join Columns (USING)</div>
+                <div className={styles.codeBlock}>USING ({(data.usingColumns as string[]).join(', ')})</div>
               </div>
             )}
           </>
@@ -204,15 +218,29 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
 
         {type === 'filterNode' && (
           <div className={styles.section}>
-            <div className={styles.sectionTitle}>{String(data.type)} Condition</div>
-            <div className={styles.codeBlock}>{String(data.raw)}</div>
+            <div className={styles.sectionTitle}>{String(data.type || 'WHERE')} Condition</div>
+            <div className={styles.codeBlock}>
+              {String(
+                data.raw ||
+                  (Array.isArray(data.columns) && data.columns.length > 0
+                    ? (data.columns as string[]).join(' AND ')
+                    : 'Condition')
+              )}
+            </div>
           </div>
         )}
 
         {type === 'aggregateNode' && (
           <div className={styles.section}>
             <div className={styles.sectionTitle}>GROUP BY Keys</div>
-            <div className={styles.codeBlock}>{String(data.raw)}</div>
+            <div className={styles.codeBlock}>
+              {String(
+                data.raw ||
+                  (Array.isArray(data.columns) && data.columns.length > 0
+                    ? (data.columns as string[]).join(', ')
+                    : 'ALL')
+              )}
+            </div>
           </div>
         )}
 
@@ -248,7 +276,9 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
             <div className={styles.sectionTitle}>Selected Projections</div>
             <div className={styles.codeBlock}>
               {Array.isArray(data.projections)
-                ? (data.projections as Array<{ raw: string }>).map((p) => p.raw).join('\n')
+                ? (data.projections as Array<{ raw?: string; expr?: string; alias?: string }>)
+                    .map((p) => p.raw || (p.alias ? `${p.expr} AS ${p.alias}` : p.expr) || '*')
+                    .join('\n')
                 : '*'}
             </div>
           </div>

@@ -113,8 +113,14 @@ const SchemaFlowInner: React.FC<SchemaFlowCanvasProps> = ({
         <input
           type="text"
           placeholder="Filter tables..."
+          aria-label="Filter schema tables"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Escape') {
+              setSearchQuery('');
+            }
+          }}
           style={{
             background: 'transparent',
             border: 'none',
@@ -127,6 +133,8 @@ const SchemaFlowInner: React.FC<SchemaFlowCanvasProps> = ({
         {searchQuery && (
           <button
             onClick={() => setSearchQuery('')}
+            aria-label="Clear table filter"
+            title="Clear table filter (Escape)"
             style={{
               background: 'transparent',
               border: 'none',
