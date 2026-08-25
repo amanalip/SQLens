@@ -47,17 +47,40 @@ export const ForeignKeyEdge: React.FC<EdgeProps> = ({
               transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
               background: 'var(--bg-card, #1a222f)',
               border: '1px solid var(--border, #2a3649)',
-              padding: '2px 6px',
+              padding: '2px 8px',
               borderRadius: 4,
-              fontSize: 10,
+              fontSize: 11,
               fontFamily: 'monospace',
               color: 'var(--text-secondary, #9ca3af)',
               pointerEvents: 'none',
               userSelect: 'none',
               zIndex: 10,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 2,
             }}
           >
-            {label}
+            {label.includes('→') ? (
+              <>
+                <span>{label.split('→')[0].trim()}</span>
+                <span
+                  style={{
+                    fontSize: 14,
+                    lineHeight: '1',
+                    margin: '0 4px',
+                    color: 'var(--node-join, #8b5cf6)',
+                    fontWeight: 600,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                  }}
+                >
+                  →
+                </span>
+                <span>{label.split('→')[1].trim()}</span>
+              </>
+            ) : (
+              label
+            )}
           </div>
         </EdgeLabelRenderer>
       )}

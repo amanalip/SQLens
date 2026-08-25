@@ -382,16 +382,17 @@ export function App() {
 
       <footer className={styles.appFooter}>
         <div className={styles.footerLeft}>
-          <span>© 2026 - Aman Ali Pogaku</span>
-          <span className={styles.footerDivider}>•</span>
-          <a
-            href="https://github.com/amanalip"
-            target="_blank"
-            rel="noreferrer"
-            className={styles.footerLink}
-          >
-            github.com/amanalip
-          </a>
+          <span>
+            © 2026 -{' '}
+            <a
+              href="https://github.com/amanalip"
+              target="_blank"
+              rel="noreferrer"
+              className={styles.footerAuthorLink}
+            >
+              Aman Ali Pogaku
+            </a>
+          </span>
         </div>
         <div className={styles.footerRight}>
           <a

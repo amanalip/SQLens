@@ -754,6 +754,18 @@
 
 ---
 
+## 87. Proportional Relationship Edge Arrow Sizing & Direct Author Link
+
+- **Issue**: Relationship edge badge arrow glyph was rendered at equal small font size to monospace text without vertical centering, and the footer author name was not directly hyperlinked to GitHub.
+- **Fix**: Structured `ForeignKeyEdge.tsx` to render a dedicated, proportional 14px centered arrow glyph between column tokens, and hyperlinked the author's name in `App.tsx` directly to their GitHub profile (`https://github.com/amanalip`).
+- **Files Modified**:
+  - `src/graph/edges/ForeignKeyEdge.tsx`
+  - `src/App.tsx`
+  - `src/App.module.css`
+  - `tests/footerAndArrow.test.ts`
+
+---
+
 ## UI/UX Feature Enhancements Log
 
 1. **Application Footer with Author Attribution**: Added footer with `© 2026 - Aman Ali Pogaku` and GitHub account link (`https://github.com/amanalip`).
