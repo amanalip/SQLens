@@ -701,13 +701,33 @@
 
 ---
 
-## 79. Sparse Dataset CSV Export Validation
+## 80. Schema DDL Column Default Value Extraction
 
-- **Issue**: In `src/ui/ResultsTable/ResultsTable.tsx`, exporting queries with sparse, non-array, or null rows could produce malformed CSV lines.
-- **Fix**: Added defensive array mapping and cell type sanitization in `generateCsv`.
+- **Issue**: In `src/parser/schemaParser.ts`, column `DEFAULT` values (numeric, string, timestamp) were parsed as part of the constraint string but never assigned to `col.defaultValue`, leaving default indicators missing.
+- **Fix**: Added regex extraction for `DEFAULT <expr>` in `parseTableDefinition` and assigned it to `ColumnSchema.defaultValue`.
 - **Files Modified**:
-  - `src/ui/ResultsTable/ResultsTable.tsx`
-  - `tests/csvSparseExport.test.ts`
+  - `src/parser/schemaParser.ts`
+  - `tests/schemaDefaultValue.test.ts`
+
+---
+
+## 81. CTE Node Type Matching in Details Panel Inspector
+
+- **Issue**: In `src/ui/DetailsPanel/DetailsPanel.tsx`, CTE nodes rendered under type `cteSubgraphNode` fell through to generic details instead of rendering the dedicated Common Table Expression (WITH) inspector.
+- **Fix**: Updated condition to match both `cteNode` and `cteSubgraphNode`.
+- **Files Modified**:
+  - `src/ui/DetailsPanel/DetailsPanel.tsx`
+  - `tests/cteInspectorDetails.test.ts`
+
+---
+
+## 82. CTE Subgraph Fallback Data Flow Summary
+
+- **Issue**: In `src/graph/nodes/CTESubgraphNode.tsx`, CTE nodes with missing or empty source models produced incomplete summary strings.
+- **Fix**: Added defensive source mapping and preview text generation.
+- **Files Modified**:
+  - `src/graph/nodes/CTESubgraphNode.tsx`
+  - `tests/cteNodeRendering.test.ts`
 
 ---
 
@@ -736,8 +756,13 @@
 
 ---
 
-## Expanded Test Coverage (28 Test Suites, 107 Tests)
+## Expanded Test Coverage (33 Test Suites, 114 Tests)
 
+- `tests/schemaDefaultValue.test.ts`: Numeric, string, and timestamp default value extraction in schema DDL.
+- `tests/cteInspectorDetails.test.ts`: CTE projections formatting and inspector drawer mapping.
+- `tests/schemaClauseSplitting.test.ts`: DDL clause splitting with nested parentheses and complex types.
+- `tests/checkConstraintParsing.test.ts`: Primary key and NOT NULL nullability constraint separation.
+- `tests/cteNodeRendering.test.ts`: CTE node data mapping and fallback summary generation.
 - `tests/commentOnlyQuery.test.ts`: Graceful handling of comment-only and whitespace-only queries with 0 error diagnostics.
 - `tests/resultsTableReset.test.ts`: In-table search filter auto-reset on query execution result changes.
 - `tests/csvSparseExport.test.ts`: Safe CSV generation for sparse rows, missing arrays, and null cells.

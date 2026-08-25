@@ -208,6 +208,13 @@ function parseTableDefinition(tableName: string, body: string): TableSchema {
         });
       }
 
+      // Extract DEFAULT value if present
+      const defaultMatch = constraints.match(/DEFAULT\s+('([^']*)'|"([^"]*)"|\S+)/i);
+      let defaultValue: string | undefined;
+      if (defaultMatch) {
+        defaultValue = defaultMatch[1].trim();
+      }
+
       if (isPk) {
         primaryKey.push(colName);
       }
@@ -219,6 +226,7 @@ function parseTableDefinition(tableName: string, body: string): TableSchema {
         isPrimaryKey: isPk,
         isForeignKey: Boolean(inlineRef),
         isUnique,
+        defaultValue,
         references: refObj,
       });
     }

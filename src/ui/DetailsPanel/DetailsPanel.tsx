@@ -182,8 +182,8 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
           {type === 'aggregateNode' && <Layers size={14} color="#ec4899" />}
           {type === 'sortLimitNode' && <ArrowDownUp size={14} color="#06b6d4" />}
           {type === 'outputNode' && <CheckCircle size={14} color="#10b981" />}
-          {type === 'cteNode' && <Layers size={14} color="#a855f7" />}
-          <span>{type === 'cteNode' ? `CTE: ${data.name || ''}` : 'Node Details'}</span>
+          {(type === 'cteNode' || type === 'cteSubgraphNode') && <Layers size={14} color="#a855f7" />}
+          <span>{type === 'cteNode' || type === 'cteSubgraphNode' ? `CTE: ${data.name || ''}` : 'Node Details'}</span>
         </div>
         <button
           onClick={onClose}
@@ -196,7 +196,7 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
       </div>
 
       <div className={styles.content}>
-        {type === 'cteNode' && (
+        {(type === 'cteNode' || type === 'cteSubgraphNode') && (
           <>
             <div className={styles.section}>
               <div className={styles.sectionTitle}>Common Table Expression (WITH)</div>
