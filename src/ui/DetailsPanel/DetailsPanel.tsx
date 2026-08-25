@@ -95,7 +95,7 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
                   )}
                   {c.references && (
                     <div style={{ fontSize: 10, color: 'var(--accent, #3b82f6)' }}>
-                      -&gt; {c.references.table}.{c.references.column}
+                      → {c.references.table}.{c.references.column}
                     </div>
                   )}
                 </div>
@@ -152,7 +152,7 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
               <div className={styles.sectionTitle}>Relationships ({table.foreignKeys.length})</div>
               {table.foreignKeys.map((fk, idx) => (
                 <div key={idx} className={styles.codeBlock}>
-                  {fk.fromColumn} -&gt; {fk.toTable}({fk.toColumn})
+                  {fk.fromColumn} → {fk.toTable}({fk.toColumn})
                 </div>
               ))}
             </div>

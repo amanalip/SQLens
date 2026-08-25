@@ -671,12 +671,23 @@
 
 ---
 
-## 74. Empty Database Schema Guidance Card
+## 75. Error Boundary Layout Dimension Storage Cleanup
 
-- **Issue**: In `src/graph/SchemaFlowCanvas.tsx`, opening an empty database resulted in a blank canvas without user guidance.
-- **Fix**: Added a clean empty state card directing users to create tables in Query Mode or load a database.
+- **Issue**: In `src/ErrorBoundary.tsx`, resetting the session only removed `sqlens_theme`, leaving broken or corrupted panel width/height settings in `localStorage`.
+- **Fix**: Added cleanup for `sqlens_editor_width` and `sqlens_results_height` to guarantee full recovery.
 - **Files Modified**:
-  - `src/graph/SchemaFlowCanvas.tsx`
+  - `src/ErrorBoundary.tsx`
+  - `tests/errorBoundaryReset.test.ts`
+
+---
+
+## 76. Details Panel Relationship Glyph Rendering
+
+- **Issue**: In `src/ui/DetailsPanel/DetailsPanel.tsx`, relationship links and column references rendered raw text `-&gt;` instead of unicode arrows.
+- **Fix**: Replaced raw entity strings with clean unicode arrows (`→`).
+- **Files Modified**:
+  - `src/ui/DetailsPanel/DetailsPanel.tsx`
+  - `tests/detailsPanelFormat.test.ts`
 
 ---
 
@@ -705,8 +716,10 @@
 
 ---
 
-## Expanded Test Coverage (21 Test Suites, 92 Tests)
+## Expanded Test Coverage (23 Test Suites, 95 Tests)
 
+- `tests/errorBoundaryReset.test.ts`: Complete cleanup of theme and panel layout dimensions during recovery reset.
+- `tests/detailsPanelFormat.test.ts`: Relationship glyph and column target reference path formatting.
 - `tests/dialectsLiteralProtection.test.ts`: Dialect signature detection with string literal stripping and URL immunity.
 - `tests/schemaColumnSearch.test.ts`: Schema table matching by table name and column names.
 - `tests/exportFilter.test.ts`: Screenshot node filter validation for overlays, panels, and controls.

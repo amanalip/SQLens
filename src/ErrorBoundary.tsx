@@ -81,6 +81,8 @@ export class ErrorBoundary extends Component<Props, State> {
               onClick={() => {
                 window.location.hash = '';
                 localStorage.removeItem('sqlens_theme');
+                localStorage.removeItem('sqlens_editor_width');
+                localStorage.removeItem('sqlens_results_height');
                 window.location.reload();
               }}
               style={{
