@@ -28,10 +28,10 @@ export const SortLimitNode: React.FC<NodeProps> = ({ data, selected }) => {
         </span>
       </div>
       <div className={styles.nodeBody}>
-        {sortData.orderBy.length === 0 && !sortData.limit && (
+        {(!sortData.orderBy || sortData.orderBy.length === 0) && !sortData.limit && (
           <div className={styles.codeSnippet}>Natural order, no limit</div>
         )}
-        {sortData.orderBy.length > 0 && (
+        {sortData.orderBy && sortData.orderBy.length > 0 && (
           <div>
             <div>Sort:</div>
             <div className={styles.codeSnippet}>
@@ -40,7 +40,7 @@ export const SortLimitNode: React.FC<NodeProps> = ({ data, selected }) => {
           </div>
         )}
         {sortData.limit && (
-          <div style={{ marginTop: sortData.orderBy.length > 0 ? 6 : 0 }}>
+          <div style={{ marginTop: sortData.orderBy && sortData.orderBy.length > 0 ? 6 : 0 }}>
             <div>Limit:</div>
             <div className={styles.codeSnippet}>
               LIMIT {sortData.limit.count}

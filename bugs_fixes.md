@@ -721,13 +721,33 @@
 
 ---
 
-## 82. CTE Subgraph Fallback Data Flow Summary
+## 83. Output Node Safe Projection Fallbacks
 
-- **Issue**: In `src/graph/nodes/CTESubgraphNode.tsx`, CTE nodes with missing or empty source models produced incomplete summary strings.
-- **Fix**: Added defensive source mapping and preview text generation.
+- **Issue**: In `src/graph/nodes/OutputNode.tsx`, accessing `outputData.projections.length` on non-SELECT or raw DDL queries caused a `TypeError` if `projections` was undefined.
+- **Fix**: Added safe array validation `(outputData.projections && outputData.projections.length > 0)` and defaulted to wildcard representation.
 - **Files Modified**:
-  - `src/graph/nodes/CTESubgraphNode.tsx`
-  - `tests/cteNodeRendering.test.ts`
+  - `src/graph/nodes/OutputNode.tsx`
+  - `tests/outputNodeSafeRender.test.ts`
+
+---
+
+## 84. Sort & Limit Node Safe OrderBy Fallback
+
+- **Issue**: In `src/graph/nodes/SortLimitNode.tsx`, accessing `sortData.orderBy.length` directly threw an error when `orderBy` was omitted in dynamic query models.
+- **Fix**: Added safe fallback checking `(!sortData.orderBy || sortData.orderBy.length === 0)` and displayed a clean "Natural order, no limit" message.
+- **Files Modified**:
+  - `src/graph/nodes/SortLimitNode.tsx`
+  - `tests/sortLimitSafeRender.test.ts`
+
+---
+
+## 85. Aggregate Node Safe Column Formatting
+
+- **Issue**: In `src/graph/nodes/AggregateNode.tsx`, rendering aggregate keys when `columns` array was missing or empty produced blank snippet lines.
+- **Fix**: Added fallback to default group expression or `'ALL'` for full-dataset aggregations.
+- **Files Modified**:
+  - `src/graph/nodes/AggregateNode.tsx`
+  - `tests/aggregateNodeSafeRender.test.ts`
 
 ---
 
@@ -756,8 +776,13 @@
 
 ---
 
-## Expanded Test Coverage (33 Test Suites, 114 Tests)
+## Expanded Test Coverage (38 Test Suites, 126 Tests)
 
+- `tests/outputNodeSafeRender.test.ts`: Output projection rendering with explicit aliases, empty arrays, and undefined models.
+- `tests/sortLimitSafeRender.test.ts`: Sort direction formatting, column lists, and limit/offset rendering.
+- `tests/aggregateNodeSafeRender.test.ts`: Raw aggregate expressions and column fallback formatting.
+- `tests/joinNodeDisplay.test.ts`: Join conditions, USING clauses, and Cartesian product identification.
+- `tests/tableNodeDisplay.test.ts`: Schema-qualified table names and aliases formatting.
 - `tests/schemaDefaultValue.test.ts`: Numeric, string, and timestamp default value extraction in schema DDL.
 - `tests/cteInspectorDetails.test.ts`: CTE projections formatting and inspector drawer mapping.
 - `tests/schemaClauseSplitting.test.ts`: DDL clause splitting with nested parentheses and complex types.
