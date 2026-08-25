@@ -70,6 +70,11 @@ export const DiagnosticsBar: React.FC<DiagnosticsBarProps> = ({
             )}
             {hasLine && <span className={styles.badge}>Line {d.line}</span>}
             <span className={styles.message}>{d.message}</span>
+            {d.suggestion && (
+              <span className={styles.suggestionTag} title={d.suggestion}>
+                Tip: {d.suggestion}
+              </span>
+            )}
           </div>
         );
       })}

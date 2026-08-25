@@ -22,6 +22,10 @@ import {
   ArrowUp,
   ArrowDown,
   AlertCircle,
+  Search,
+  RotateCcw,
+  Loader2,
+  X,
 } from 'lucide-react';
 import { QueryExecutionResult } from '../../engine/worker';
 import styles from './ResultsTable.module.css';
@@ -29,11 +33,19 @@ import styles from './ResultsTable.module.css';
 interface ResultsTableProps {
   result: QueryExecutionResult | null;
   error?: string | null;
+  isExecuting?: boolean;
+  onClear?: () => void;
 }
 
-export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => {
+export const ResultsTable: React.FC<ResultsTableProps> = ({
+  result,
+  error,
+  isExecuting = false,
+  onClear,
+}) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [copied, setCopied] = useState(false);
+  const [filterQuery, setFilterQuery] = useState('');
 
   const columns = useMemo<ColumnDef<Record<string, unknown>>[]>(() => {
     if (!result || !result.columns) return [];
@@ -60,7 +72,7 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
     }));
   }, [result]);
 
-  const data = useMemo<Record<string, unknown>[]>(() => {
+  const rawData = useMemo<Record<string, unknown>[]>(() => {
     if (!result || !result.values) return [];
     return result.values.map((row) => {
       const rowObj: Record<string, unknown> = {};
@@ -70,6 +82,16 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
       return rowObj;
     });
   }, [result]);
+
+  const data = useMemo<Record<string, unknown>[]>(() => {
+    if (!filterQuery.trim()) return rawData;
+    const q = filterQuery.toLowerCase();
+    return rawData.filter((row) =>
+      Object.values(row).some((val) =>
+        val !== null && val !== undefined && String(val).toLowerCase().includes(q)
+      )
+    );
+  }, [rawData, filterQuery]);
 
   const table = useReactTable({
     data,
@@ -130,11 +152,41 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
     URL.revokeObjectURL(url);
   };
 
+  if (isExecuting) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <div className={styles.statsGroup}>
+            <div className={styles.statItem} style={{ color: 'var(--accent, #3b82f6)' }}>
+              <Loader2 size={13} className={styles.spinner} />
+              <span>Executing query in WebAssembly engine...</span>
+            </div>
+          </div>
+        </div>
+        <div className={styles.emptyState}>
+          <Loader2 size={24} className={styles.spinner} style={{ color: 'var(--accent, #3b82f6)' }} />
+          <div>Running SQLite query...</div>
+        </div>
+      </div>
+    );
+  }
+
   if (error) {
     return (
       <div className={styles.container}>
         <div className={styles.header}>
           <span>Query Error</span>
+          {onClear && (
+            <button
+              className={styles.csvButton}
+              onClick={onClear}
+              title="Clear error view"
+              aria-label="Clear error view"
+            >
+              <RotateCcw size={12} />
+              <span>Clear</span>
+            </button>
+          )}
         </div>
         <div className={styles.errorState}>
           <AlertCircle size={16} />
@@ -168,6 +220,17 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
               <span className={styles.statValue}>{result.executionTimeMs} ms</span>
             </div>
           </div>
+          {onClear && (
+            <button
+              className={styles.csvButton}
+              onClick={onClear}
+              title="Clear results view"
+              aria-label="Clear results view"
+            >
+              <RotateCcw size={12} />
+              <span>Clear</span>
+            </button>
+          )}
         </div>
         <div className={styles.emptyState}>
           <div>Query executed successfully. 0 rows returned.</div>
@@ -184,6 +247,11 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
             <Rows size={13} />
             <span>Rows:</span>
             <span className={styles.statValue}>{result.rowCount}</span>
+            {filterQuery && (
+              <span style={{ fontSize: 10, color: 'var(--accent, #3b82f6)' }}>
+                ({data.length} matching)
+              </span>
+            )}
           </div>
           <div className={styles.statItem}>
             <Clock size={13} />
@@ -193,6 +261,28 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
         </div>
 
         <div className={styles.actionsGroup}>
+          <div className={styles.searchInputWrapper}>
+            <Search size={12} />
+            <input
+              type="text"
+              className={styles.searchInput}
+              placeholder="Search rows..."
+              value={filterQuery}
+              onChange={(e) => setFilterQuery(e.target.value)}
+              aria-label="Filter result rows"
+            />
+            {filterQuery && (
+              <button
+                onClick={() => setFilterQuery('')}
+                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: 0 }}
+                title="Clear search filter"
+                aria-label="Clear search filter"
+              >
+                <X size={10} />
+              </button>
+            )}
+          </div>
+
           <button
             className={styles.csvButton}
             onClick={handleCopyCsv}
@@ -211,6 +301,17 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({ result, error }) => 
             <Download size={12} />
             <span>Download CSV</span>
           </button>
+          {onClear && (
+            <button
+              className={styles.csvButton}
+              onClick={onClear}
+              title="Clear results view"
+              aria-label="Clear results view"
+            >
+              <RotateCcw size={12} />
+              <span>Clear</span>
+            </button>
+          )}
         </div>
       </div>
 

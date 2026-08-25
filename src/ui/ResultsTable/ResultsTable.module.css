@@ -44,6 +44,43 @@
   gap: 8px;
 }
 
+.searchInputWrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-primary, #0f141c);
+  border: 1px solid var(--border, #2a3649);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--text-secondary, #9ca3af);
+}
+
+.searchInput {
+  background: transparent;
+  border: none;
+  color: var(--text-primary, #f3f4f6);
+  font-size: 11px;
+  outline: none;
+  width: 110px;
+}
+
+.searchInput::placeholder {
+  color: var(--text-muted, #6b7280);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .csvButton {
   display: flex;
   align-items: center;

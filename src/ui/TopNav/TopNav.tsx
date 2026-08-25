@@ -121,7 +121,7 @@ export const TopNav: React.FC<TopNavProps> = ({
             ))}
           </select>
 
-          {mode === 'query' && activeDb.samples.length > 0 && (
+          {mode === 'query' && selectedDbId !== 'custom' && activeDb.samples.length > 0 && (
             <select
               className={styles.select}
               defaultValue=""
@@ -144,6 +144,12 @@ export const TopNav: React.FC<TopNavProps> = ({
                 </option>
               ))}
             </select>
+          )}
+
+          {mode === 'query' && selectedDbId === 'custom' && (
+            <span style={{ fontSize: 11, padding: '4px 8px', borderRadius: 4, background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}>
+              Custom Database Active
+            </span>
           )}
         </div>
       </div>

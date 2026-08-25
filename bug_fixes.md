@@ -630,6 +630,71 @@
 
 ---
 
+## 64. String Literal Protection in SQL Formatter
+
+- **Issue**: In `src/ui/EditorPane/EditorPane.tsx`, keyword regex replacements and clause newline formatting mutated text inside single- and double-quoted string literals, causing text values like `'Rock and Roll'` to split or change casing.
+- **Fix**: Implemented token-based placeholder protection that extracts all string literals prior to formatting and restores them verbatim afterward.
+- **Files Modified**:
+  - `src/ui/EditorPane/EditorPane.tsx`
+  - `tests/formatter.test.ts`
+
+---
+
+## 65. Custom Database Sample Query Isolation in TopNav
+
+- **Issue**: In `src/ui/TopNav/TopNav.tsx`, when a custom SQLite database was uploaded, the preset example queries dropdown fell back to Chinook queries, which caused SQL errors when executed.
+- **Fix**: Isolated the sample query selector to predefined catalog databases and rendered a clean "Custom Database Active" indicator when custom database files are loaded.
+- **Files Modified**:
+  - `src/ui/TopNav/TopNav.tsx`
+
+---
+
+## 66. In-Table Real-Time Search & Row Filtering
+
+- **Issue**: In `src/ui/ResultsTable/ResultsTable.tsx`, users had to scan paginated pages manually or write additional SQL `WHERE` conditions to find specific values in large result sets.
+- **Fix**: Added an in-table search input in the results header that filters rows in real-time across strings, numbers, and boolean values without re-executing the query.
+- **Files Modified**:
+  - `src/ui/ResultsTable/ResultsTable.tsx`
+  - `src/ui/ResultsTable/ResultsTable.module.css`
+  - `tests/resultsFilter.test.ts`
+
+---
+
+## 67. WebAssembly Query Execution Loader & Results Clearing
+
+- **Issue**: When running queries, `ResultsTable` did not show an active loading state, leaving previous results on screen without progress indication.
+- **Fix**: Added an animated executing loader with status messaging and added a "Clear" action button to dismiss results or error views.
+- **Files Modified**:
+  - `src/ui/ResultsTable/ResultsTable.tsx`
+  - `src/ui/ResultsTable/ResultsTable.module.css`
+  - `src/App.tsx`
+
+---
+
+## 68. Subquery Visual Node and Flow Edge Generation
+
+- **Issue**: In `src/layout/queryLayout.ts`, subqueries located in `WHERE` or `HAVING` clauses were not rendered as distinct visual nodes on the query canvas.
+- **Fix**: Added recursive AST subquery extraction in `queryAnalyzer.ts` and generated connected subquery cards with animated flow edges in `queryLayout.ts`.
+- **Files Modified**:
+  - `src/parser/queryAnalyzer.ts`
+  - `src/layout/queryLayout.ts`
+  - `src/model/query.ts`
+  - `tests/subqueryLayout.test.ts`
+
+---
+
+## 69. Inline Diagnostic Fix Suggestions & Copy SQL Action
+
+- **Issue**: Diagnostic tips were only visible on hover tooltips, and the editor lacked a quick copy action for query text.
+- **Fix**: Added inline suggestion badges in `DiagnosticsBar.tsx` and a one-click "Copy SQL" button with visual feedback in `EditorPane.tsx`.
+- **Files Modified**:
+  - `src/ui/DiagnosticsBar/DiagnosticsBar.tsx`
+  - `src/ui/DiagnosticsBar/DiagnosticsBar.module.css`
+  - `src/ui/EditorPane/EditorPane.tsx`
+  - `tests/diagnosticsEnhancements.test.ts`
+
+---
+
 ## UI/UX Feature Enhancements Log
 
 1. **Extendable Editor Resizers**: Horizontal and vertical splitters allowing dynamic panel resizing with `localStorage` persistence.
@@ -642,11 +707,24 @@
 8. **Column Default Value & Foreign Key Badges**: Inline badges displaying defaults and target references.
 9. **Custom SQLite DB File Upload**: Upload custom `.sqlite` and `.db` files from the top navigation bar.
 10. **230 Verified Example Queries**: 10 curated queries for each of the 23 sample databases.
+11. **Protected String Literal SQL Formatter**: Preserves casing and layout inside single- and double-quoted strings.
+12. **In-Table Real-Time Search / Row Filter**: Filter result table rows in memory with matching row counts.
+13. **Animated Execution Spinner & Progress State**: Clear WebAssembly loading feedback in results pane.
+14. **Clear Results Action Button**: Dismiss query results or error states with one click.
+15. **Visual Subquery Block Cards**: Connected subquery node visualization for nested `WHERE` queries.
+16. **Custom Database Graceful Example Handling**: Clear status indicator for uploaded custom databases.
+17. **Inline Diagnostic Suggestion Badges**: Direct tip badges on diagnostics bar for faster query fixes.
+18. **One-Click Copy SQL to Clipboard**: Copy button in editor toolbar with transient confirmation.
 
 ---
 
-## Expanded Test Coverage (11 Test Suites, 58 Tests)
+## Expanded Test Coverage (16 Test Suites, 76 Tests)
 
+- `tests/formatter.test.ts`: String literal preservation and keyword formatting validation.
+- `tests/subqueryLayout.test.ts`: Nested subquery node creation and DAG flow edge connectivity.
+- `tests/mutationParsing.test.ts`: DML AST model parsing for `INSERT`, `UPDATE`, and `DELETE` queries.
+- `tests/resultsFilter.test.ts`: In-memory multi-type row searching and null-safe filtering logic.
+- `tests/diagnosticsEnhancements.test.ts`: Diagnostic suggestions, rule IDs, and error line number mapping.
 - `tests/databaseCatalog.test.ts`: Verifies all 23 databases have 10 queries, validates AST parsing on all 230 queries, and executes all 230 queries against in-memory SQLite instances with 0 errors.
 - `tests/export.test.ts`: CSV generator logic with nulls, booleans, objects, quotes, multiline strings, zero-column edge cases, and empty dataset pagination calculations.
 - `tests/schemaParser.test.ts`: Multi-word data types, composite primary keys, foreign keys, missing indexes, schema-qualified table names.

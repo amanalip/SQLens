@@ -58,3 +58,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.suggestionTag {
+  font-size: 10px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}

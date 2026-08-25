@@ -238,12 +238,24 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
       view.dispatch(setDiagnostics(view.state, cmDiagnostics));
     }, [diagnostics]);
 
-    // Format SQL query helper
+    const [copiedSql, setCopiedSql] = React.useState(false);
+
+    // Format SQL query helper with string literal protection
     const handleFormat = () => {
       const view = editorViewRef.current;
       if (!view) return;
       const sqlText = view.state.doc.toString();
       if (!sqlText.trim()) return;
+
+      // Extract and preserve single-quoted and double-quoted string literals
+      const stringLiterals: string[] = [];
+      const placeholder = (idx: number) => `__SQLENS_STR_LITERAL_${idx}__`;
+
+      let protectedSql = sqlText.replace(/'(?:''|[^'])*'|"(?:""|[^"])*"/g, (match) => {
+        const idx = stringLiterals.length;
+        stringLiterals.push(match);
+        return placeholder(idx);
+      });
 
       const keywords = [
         'SELECT', 'FROM', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY',
@@ -253,9 +265,9 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
         'AS', 'DISTINCT', 'COUNT', 'SUM', 'AVG', 'MIN', 'MAX', 'CASE', 'WHEN', 'THEN', 'ELSE', 'END'
       ];
 
-      let formatted = sqlText;
+      let formatted = protectedSql;
 
-      // Uppercase standard keywords
+      // Uppercase standard keywords outside literals
       keywords.forEach((kw) => {
         const regex = new RegExp(`\\b${kw}\\b`, 'gi');
         formatted = formatted.replace(regex, kw);
@@ -271,6 +283,11 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
       majorClauses.forEach((clause) => {
         const regex = new RegExp(`\\s*\\b(${clause})\\b`, 'g');
         formatted = formatted.replace(regex, '\n$1');
+      });
+
+      // Restore string literals
+      stringLiterals.forEach((literal, idx) => {
+        formatted = formatted.replace(placeholder(idx), literal);
       });
 
       formatted = formatted.trim();
@@ -293,6 +310,16 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
       });
       onChangeRef.current('');
       view.focus();
+    };
+
+    // Copy SQL text
+    const handleCopySql = () => {
+      const view = editorViewRef.current;
+      const textToCopy = view ? view.state.doc.toString() : value;
+      if (!textToCopy) return;
+      navigator.clipboard.writeText(textToCopy);
+      setCopiedSql(true);
+      setTimeout(() => setCopiedSql(false), 2000);
     };
 
     // File upload handler
@@ -330,6 +357,16 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
             >
               <Sparkles size={13} />
               <span>Format</span>
+            </button>
+
+            <button
+              className={styles.toolButton}
+              onClick={handleCopySql}
+              aria-label="Copy SQL query to clipboard"
+              title="Copy SQL query"
+            >
+              <RotateCcw size={13} style={{ display: 'none' }} />
+              <span>{copiedSql ? 'Copied' : 'Copy'}</span>
             </button>
 
             <button

@@ -142,6 +142,30 @@ export function buildQueryGraph(model: QueryModel): LayoutResult {
       },
     });
 
+    // Render any subqueries embedded in WHERE filters
+    const whereSubqueries = (model.subqueries || []).filter((sq) => sq.location === 'WHERE');
+    whereSubqueries.forEach((sq, sqIdx) => {
+      const sqNodeId = `subquery_where_${sqIdx}`;
+      nodes.push({
+        id: sqNodeId,
+        type: 'cteNode',
+        position: { x: currentX, y: 10 + sqIdx * -120 },
+        data: {
+          name: sq.alias || `Subquery (WHERE #${sqIdx + 1})`,
+          model: sq.model,
+          summary: `(SELECT from ${sq.model?.sources?.map((s) => s.name).join(', ') || 'subquery'})`,
+        },
+      });
+      edges.push({
+        id: `edge_${sqNodeId}_${filterNodeId}`,
+        source: sqNodeId,
+        target: filterNodeId,
+        type: 'flowEdge',
+        animated: true,
+        markerEnd: { type: MarkerType.ArrowClosed },
+      });
+    });
+
     previousNodeIds.forEach((prevId) => {
       edges.push({
         id: `edge_${prevId}_${filterNodeId}`,

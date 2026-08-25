@@ -325,7 +325,15 @@ export function App() {
                 title="Drag to resize results / editor height"
               />
               <div className={styles.resultsSection} style={{ height: resultsHeight }}>
-                <ResultsTable result={queryResult} error={executionError} />
+                <ResultsTable
+                  result={queryResult}
+                  error={executionError}
+                  isExecuting={isExecuting}
+                  onClear={() => {
+                    setQueryResult(null);
+                    setExecutionError(null);
+                  }}
+                />
               </div>
             </div>
             <div

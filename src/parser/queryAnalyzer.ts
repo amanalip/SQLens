@@ -127,6 +127,36 @@ export function extractColumnsFromExpr(expr: unknown, list: string[] = []): stri
   return list;
 }
 
+// Extract subqueries from expressions (e.g. WHERE col > (SELECT ...))
+export function extractSubqueriesFromExpr(
+  expr: unknown,
+  location: 'WHERE' | 'HAVING' | 'SELECT' | 'JOIN',
+  list: SubqueryNode[] = []
+): SubqueryNode[] {
+  if (!expr || typeof expr !== 'object') return list;
+
+  const node = expr as Record<string, unknown>;
+
+  if (node.ast) {
+    const subModel = analyzeAst(node.ast, '');
+    list.push({
+      id: `sub_${location.toLowerCase()}_${list.length}`,
+      location,
+      model: subModel,
+    });
+  }
+
+  if (node.left) extractSubqueriesFromExpr(node.left, location, list);
+  if (node.right) extractSubqueriesFromExpr(node.right, location, list);
+  if (node.expr) extractSubqueriesFromExpr(node.expr, location, list);
+  if (node.args) extractSubqueriesFromExpr(node.args, location, list);
+  if (Array.isArray(node.value)) {
+    node.value.forEach((v) => extractSubqueriesFromExpr(v, location, list));
+  }
+
+  return list;
+}
+
 export function analyzeAst(ast: unknown, rawSql: string): QueryModel {
   const node = (ast || {}) as Record<string, unknown>;
   const queryTypeStr = String(node.type || 'select').toUpperCase();
@@ -299,6 +329,7 @@ export function analyzeAst(ast: unknown, rawSql: string): QueryModel {
       type: 'WHERE',
       columns: cols,
     });
+    extractSubqueriesFromExpr(node.where, 'WHERE', subqueries);
   }
 
   // Process GROUP BY
@@ -334,6 +365,7 @@ export function analyzeAst(ast: unknown, rawSql: string): QueryModel {
       type: 'HAVING',
       columns: cols,
     };
+    extractSubqueriesFromExpr(node.having, 'HAVING', subqueries);
   }
 
   // Process ORDER BY

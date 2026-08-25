@@ -59,7 +59,7 @@ export interface CTENode {
 export interface SubqueryNode {
   id: string;
   alias?: string;
-  location: 'FROM' | 'JOIN' | 'WHERE' | 'SELECT';
+  location: 'FROM' | 'JOIN' | 'WHERE' | 'HAVING' | 'SELECT';
   model: QueryModel;
 }
 
