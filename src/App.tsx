@@ -179,6 +179,16 @@ export function App() {
     try {
       const res = await sqlEngine.executeQuery(sqlQuery);
       setQueryResult(res);
+
+      // Auto-refresh schema if a mutation or DDL query was run
+      if (/^\s*(create|alter|drop|insert|update|delete|attach|detach)\b/i.test(sqlQuery)) {
+        try {
+          const updatedSchema = await sqlEngine.getSchema();
+          setSchema(updatedSchema);
+        } catch {
+          // Schema refresh optional
+        }
+      }
     } catch (err: unknown) {
       const errorObj = err as Error;
       setExecutionError(errorObj.message || 'Execution failed');
@@ -210,6 +220,29 @@ export function App() {
     if (dbConfig && dbConfig.samples[0]) {
       setSqlQuery(dbConfig.samples[0].sql);
       editorRef.current?.setValue(dbConfig.samples[0].sql);
+    }
+  };
+
+  const handleUploadDatabase = async (file: File) => {
+    setIsLoadingDb(true);
+    setExecutionError(null);
+    try {
+      const buffer = await file.arrayBuffer();
+      await sqlEngine.loadDatabaseBuffer(buffer);
+      const extractedSchema = await sqlEngine.getSchema();
+      setSchema(extractedSchema);
+      setSelectedDbId('custom');
+      const firstTableName = Object.keys(extractedSchema.tables)[0];
+      if (firstTableName) {
+        const defaultSql = `SELECT * FROM ${firstTableName} LIMIT 25;`;
+        setSqlQuery(defaultSql);
+        editorRef.current?.setValue(defaultSql);
+      }
+    } catch (err: unknown) {
+      const error = err as Error;
+      setExecutionError(error.message || 'Failed to upload database');
+    } finally {
+      setIsLoadingDb(false);
     }
   };
 
@@ -255,6 +288,7 @@ export function App() {
         theme={theme}
         onToggleTheme={() => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
         isLoadingDb={isLoadingDb}
+        onUploadDatabase={handleUploadDatabase}
       />
 
       <div className={styles.mainLayout}>

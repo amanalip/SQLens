@@ -173,6 +173,10 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
               const colObj = columns.find((c) => c.name.toLowerCase() === fromCol.toLowerCase());
               if (colObj) {
                 colObj.isForeignKey = true;
+                colObj.references = {
+                  table: toTable,
+                  column: toCol,
+                };
               }
 
               foreignKeys.push({
@@ -224,6 +228,24 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
             // Count query optional
           }
 
+          // Get sample rows (top 5 preview)
+          const sampleRows: Array<Record<string, unknown>> = [];
+          try {
+            const sampleResult = db.exec(`SELECT * FROM "${tableName}" LIMIT 5;`);
+            if (sampleResult && sampleResult.length > 0) {
+              const sCols = sampleResult[0].columns;
+              for (const sRow of sampleResult[0].values) {
+                const rowObj: Record<string, unknown> = {};
+                sCols.forEach((colName, idx) => {
+                  rowObj[colName] = sRow[idx];
+                });
+                sampleRows.push(rowObj);
+              }
+            }
+          } catch {
+            // Sample rows optional
+          }
+
           tables[tableName] = {
             name: tableName,
             columns,
@@ -232,6 +254,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
             indexes,
             rowCount,
             ddlSql,
+            sampleRows,
           };
         }
       }

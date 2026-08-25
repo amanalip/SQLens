@@ -70,15 +70,66 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
 
           <div className={styles.section}>
             <div className={styles.sectionTitle}>Columns ({table.columns?.length || 0})</div>
-            {table.columns?.map((c) => (
-              <div key={c.name} className={styles.propertyRow}>
-                <span className={styles.propertyLabel}>
-                  {c.name} {c.isPrimaryKey ? '(PK)' : ''} {c.isForeignKey ? '(FK)' : ''} {c.isUnique && !c.isPrimaryKey ? '(UQ)' : ''}
-                </span>
-                <span className={styles.propertyValue}>{c.type}</span>
-              </div>
-            ))}
+            {table.columns?.map((c) => {
+              const flags = [
+                c.isPrimaryKey ? 'PK' : null,
+                c.isForeignKey ? 'FK' : null,
+                c.isUnique && !c.isPrimaryKey ? 'UQ' : null,
+                c.nullable === false && !c.isPrimaryKey ? 'NN' : null,
+              ]
+                .filter(Boolean)
+                .join(', ');
+
+              return (
+                <div key={c.name} style={{ display: 'flex', flexDirection: 'column', gap: 2, padding: '4px 0', borderBottom: '1px solid var(--border-subtle, #222d3d)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span className={styles.propertyLabel}>
+                      {c.name} {flags ? `(${flags})` : ''}
+                    </span>
+                    <span className={styles.propertyValue}>{c.type}</span>
+                  </div>
+                  {c.defaultValue !== undefined && (
+                    <div style={{ fontSize: 10, color: 'var(--text-muted, #6b7280)' }}>
+                      DEFAULT: <span style={{ color: 'var(--accent, #3b82f6)' }}>{c.defaultValue}</span>
+                    </div>
+                  )}
+                  {c.references && (
+                    <div style={{ fontSize: 10, color: 'var(--accent, #3b82f6)' }}>
+                      -&gt; {c.references.table}.{c.references.column}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
+
+          {table.sampleRows && table.sampleRows.length > 0 && (
+            <div className={styles.section}>
+              <div className={styles.sectionTitle}>Sample Data Preview ({table.sampleRows.length} rows)</div>
+              <div className={styles.previewTableWrapper}>
+                <table className={styles.previewTable}>
+                  <thead>
+                    <tr>
+                      {table.columns?.map((col) => (
+                        <th key={col.name}>{col.name}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {table.sampleRows.map((sRow, rIdx) => (
+                      <tr key={rIdx}>
+                        {table.columns?.map((col) => (
+                          <td key={col.name} title={String(sRow[col.name] ?? 'NULL')}>
+                            {sRow[col.name] !== null && sRow[col.name] !== undefined ? String(sRow[col.name]) : 'NULL'}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
 
           {table.indexes && table.indexes.length > 0 && (
             <div className={styles.section}>
@@ -104,6 +155,15 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
                   {fk.fromColumn} -&gt; {fk.toTable}({fk.toColumn})
                 </div>
               ))}
+            </div>
+          )}
+
+          {table.ddlSql && (
+            <div className={styles.section}>
+              <div className={styles.sectionTitle}>Table DDL Definition</div>
+              <div className={styles.codeBlock} style={{ fontSize: 10, lineHeight: 1.4 }}>
+                {table.ddlSql}
+              </div>
             </div>
           )}
         </div>

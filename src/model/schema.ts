@@ -34,6 +34,8 @@ export interface TableSchema {
   foreignKeys: ForeignKeyReference[];
   indexes: IndexSchema[];
   rowCount?: number;
+  ddlSql?: string;
+  sampleRows?: Array<Record<string, unknown>>;
 }
 
 export interface SchemaModel {

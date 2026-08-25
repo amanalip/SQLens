@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   Share2,
   Download,
+  Upload,
   Moon,
   Sun,
   Layers,
@@ -24,6 +25,7 @@ interface TopNavProps {
   theme: Theme;
   onToggleTheme: () => void;
   isLoadingDb?: boolean;
+  onUploadDatabase?: (file: File) => void;
 }
 
 export const TopNav: React.FC<TopNavProps> = ({
@@ -37,9 +39,11 @@ export const TopNav: React.FC<TopNavProps> = ({
   theme,
   onToggleTheme,
   isLoadingDb = false,
+  onUploadDatabase,
 }) => {
   const [copiedShare, setCopiedShare] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const activeDb = bundledDatabases.find((db) => db.id === selectedDbId) || bundledDatabases[0];
 
@@ -107,6 +111,9 @@ export const TopNav: React.FC<TopNavProps> = ({
             title="Select SQLite database"
             aria-label="Select database"
           >
+            {selectedDbId === 'custom' && (
+              <option value="custom">Custom Database (Uploaded)</option>
+            )}
             {bundledDatabases.map((db) => (
               <option key={db.id} value={db.id}>
                 {db.name} ({db.size})
@@ -142,6 +149,33 @@ export const TopNav: React.FC<TopNavProps> = ({
       </div>
 
       <div className={styles.rightGroup}>
+        {onUploadDatabase && (
+          <>
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              accept=".sqlite,.db"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  onUploadDatabase(file);
+                }
+                e.target.value = '';
+              }}
+            />
+            <button
+              className={styles.actionButton}
+              onClick={() => fileInputRef.current?.click()}
+              title="Upload custom SQLite database (.sqlite or .db file)"
+              aria-label="Upload custom SQLite database"
+            >
+              <Upload size={13} />
+              <span>Upload DB</span>
+            </button>
+          </>
+        )}
+
         <button
           className={styles.actionButton}
           onClick={handleShareClick}
