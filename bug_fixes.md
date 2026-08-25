@@ -630,68 +630,53 @@
 
 ---
 
-## 64. String Literal Protection in SQL Formatter
+## 70. Schema Layout Safe Fallbacks on Missing Collections
 
-- **Issue**: In `src/ui/EditorPane/EditorPane.tsx`, keyword regex replacements and clause newline formatting mutated text inside single- and double-quoted string literals, causing text values like `'Rock and Roll'` to split or change casing.
-- **Fix**: Implemented token-based placeholder protection that extracts all string literals prior to formatting and restores them verbatim afterward.
+- **Issue**: In `src/layout/schemaLayout.ts`, calling `schema.orphanTables.includes(...)` caused a `TypeError: Cannot read properties of undefined` if `orphanTables` or `foreignKeys` was omitted on dynamic schema models.
+- **Fix**: Added safe array validation fallbacks for `orphanTables` and `foreignKeys`.
 - **Files Modified**:
-  - `src/ui/EditorPane/EditorPane.tsx`
-  - `tests/formatter.test.ts`
+  - `src/layout/schemaLayout.ts`
+  - `tests/emptySchemaHandling.test.ts`
 
 ---
 
-## 65. Custom Database Sample Query Isolation in TopNav
+## 71. Dialect Detection False Positive Protection for String Literals
 
-- **Issue**: In `src/ui/TopNav/TopNav.tsx`, when a custom SQLite database was uploaded, the preset example queries dropdown fell back to Chinook queries, which caused SQL errors when executed.
-- **Fix**: Isolated the sample query selector to predefined catalog databases and rendered a clean "Custom Database Active" indicator when custom database files are loaded.
+- **Issue**: In `src/parser/dialects.ts`, searching for `::` or `ilike` matched text inside string literals (e.g. `'http://api.service.com::8080/v1'` or `'I like learning SQL'`), misclassifying queries as PostgreSQL.
+- **Fix**: Stripped single- and double-quoted string literals prior to checking dialect syntax signatures.
 - **Files Modified**:
-  - `src/ui/TopNav/TopNav.tsx`
+  - `src/parser/dialects.ts`
+  - `tests/dialectsLiteralProtection.test.ts`
 
 ---
 
-## 66. In-Table Real-Time Search & Row Filtering
+## 72. Schema Search by Column Name & Table Name
 
-- **Issue**: In `src/ui/ResultsTable/ResultsTable.tsx`, users had to scan paginated pages manually or write additional SQL `WHERE` conditions to find specific values in large result sets.
-- **Fix**: Added an in-table search input in the results header that filters rows in real-time across strings, numbers, and boolean values without re-executing the query.
+- **Issue**: In `src/graph/SchemaFlowCanvas.tsx`, table search only matched table names, making it impossible to locate tables by column names (e.g. `billing_country`, `postal_code`).
+- **Fix**: Extended search matching to inspect both table names and column lists.
 - **Files Modified**:
-  - `src/ui/ResultsTable/ResultsTable.tsx`
-  - `src/ui/ResultsTable/ResultsTable.module.css`
-  - `tests/resultsFilter.test.ts`
+  - `src/graph/SchemaFlowCanvas.tsx`
+  - `tests/schemaColumnSearch.test.ts`
 
 ---
 
-## 67. WebAssembly Query Execution Loader & Results Clearing
+## 73. Graph Image Export Overlay Filter
 
-- **Issue**: When running queries, `ResultsTable` did not show an active loading state, leaving previous results on screen without progress indication.
-- **Fix**: Added an animated executing loader with status messaging and added a "Clear" action button to dismiss results or error views.
+- **Issue**: In `src/graph/export.ts`, search inputs and top overlay panels appeared in downloaded PNG screenshots.
+- **Fix**: Expanded screenshot node filter to ignore elements with `data-export-ignore="true"` and `.react-flow__panel` classes.
 - **Files Modified**:
-  - `src/ui/ResultsTable/ResultsTable.tsx`
-  - `src/ui/ResultsTable/ResultsTable.module.css`
-  - `src/App.tsx`
+  - `src/graph/export.ts`
+  - `src/graph/SchemaFlowCanvas.tsx`
+  - `tests/exportFilter.test.ts`
 
 ---
 
-## 68. Subquery Visual Node and Flow Edge Generation
+## 74. Empty Database Schema Guidance Card
 
-- **Issue**: In `src/layout/queryLayout.ts`, subqueries located in `WHERE` or `HAVING` clauses were not rendered as distinct visual nodes on the query canvas.
-- **Fix**: Added recursive AST subquery extraction in `queryAnalyzer.ts` and generated connected subquery cards with animated flow edges in `queryLayout.ts`.
+- **Issue**: In `src/graph/SchemaFlowCanvas.tsx`, opening an empty database resulted in a blank canvas without user guidance.
+- **Fix**: Added a clean empty state card directing users to create tables in Query Mode or load a database.
 - **Files Modified**:
-  - `src/parser/queryAnalyzer.ts`
-  - `src/layout/queryLayout.ts`
-  - `src/model/query.ts`
-  - `tests/subqueryLayout.test.ts`
-
----
-
-## 69. Inline Diagnostic Fix Suggestions & Copy SQL Action
-
-- **Issue**: Diagnostic tips were only visible on hover tooltips, and the editor lacked a quick copy action for query text.
-- **Fix**: Added inline suggestion badges in `DiagnosticsBar.tsx` and a one-click "Copy SQL" button with visual feedback in `EditorPane.tsx`.
-- **Files Modified**:
-  - `src/ui/DiagnosticsBar/DiagnosticsBar.tsx`
-  - `src/ui/DiagnosticsBar/DiagnosticsBar.module.css`
-  - `src/ui/EditorPane/EditorPane.tsx`
-  - `tests/diagnosticsEnhancements.test.ts`
+  - `src/graph/SchemaFlowCanvas.tsx`
 
 ---
 
@@ -715,11 +700,18 @@
 16. **Custom Database Graceful Example Handling**: Clear status indicator for uploaded custom databases.
 17. **Inline Diagnostic Suggestion Badges**: Direct tip badges on diagnostics bar for faster query fixes.
 18. **One-Click Copy SQL to Clipboard**: Copy button in editor toolbar with transient confirmation.
+19. **Column-Name Schema Table Filtering**: Locate schema tables by typing any column name in the search bar.
+20. **Clean Graph PNG Exporting**: Automatic exclusion of search overlays and UI widgets from diagram screenshots.
 
 ---
 
-## Expanded Test Coverage (16 Test Suites, 76 Tests)
+## Expanded Test Coverage (21 Test Suites, 92 Tests)
 
+- `tests/dialectsLiteralProtection.test.ts`: Dialect signature detection with string literal stripping and URL immunity.
+- `tests/schemaColumnSearch.test.ts`: Schema table matching by table name and column names.
+- `tests/exportFilter.test.ts`: Screenshot node filter validation for overlays, panels, and controls.
+- `tests/tableCardBadges.test.ts`: Primary key, unique, not null, and default badge calculation logic.
+- `tests/emptySchemaHandling.test.ts`: Safe schema graph layout for empty and orphan table collections.
 - `tests/formatter.test.ts`: String literal preservation and keyword formatting validation.
 - `tests/subqueryLayout.test.ts`: Nested subquery node creation and DAG flow edge connectivity.
 - `tests/mutationParsing.test.ts`: DML AST model parsing for `INSERT`, `UPDATE`, and `DELETE` queries.

@@ -11,14 +11,22 @@ export async function exportGraphToPng(containerElement: HTMLElement, filename =
       backgroundColor: computedBg,
       quality: 0.95,
       filter: (node) => {
-        // Exclude minimap and controls from screenshot
+        // Exclude minimap, controls, overlay search bars, and panels from screenshot
         const el = node as HTMLElement;
+        if (el.getAttribute && el.getAttribute('data-export-ignore') === 'true') {
+          return false;
+        }
+
         const cls =
           typeof el.className === 'string'
             ? el.className
             : (node as unknown as SVGElement).className?.baseVal || '';
 
-        if (cls.includes('react-flow__controls') || cls.includes('react-flow__minimap')) {
+        if (
+          cls.includes('react-flow__controls') ||
+          cls.includes('react-flow__minimap') ||
+          cls.includes('react-flow__panel')
+        ) {
           return false;
         }
         return true;

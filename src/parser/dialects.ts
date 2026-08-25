@@ -1,7 +1,9 @@
 export type SQLDialect = 'sqlite' | 'mysql' | 'postgresql';
 
 export function detectDialect(sql: string): SQLDialect {
-  const normalized = sql.toLowerCase();
+  // Strip string literals to prevent URLs or text content from triggering false positives
+  const stripped = sql.replace(/'(?:''|[^'])*'|"(?:""|[^"])*"/g, '');
+  const normalized = stripped.toLowerCase();
   
   // PostgreSQL constructs
   if (

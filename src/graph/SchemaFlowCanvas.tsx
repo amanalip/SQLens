@@ -60,8 +60,12 @@ const SchemaFlowInner: React.FC<SchemaFlowCanvasProps> = ({
     } else {
       setNodes(
         layout.nodes.map((n) => {
-          const tableName = String((n.data?.table as { name?: string })?.name || '').toLowerCase();
-          const matches = tableName.includes(query);
+          const tableObj = n.data?.table as { name?: string; columns?: Array<{ name: string }> } | undefined;
+          const tableName = String(tableObj?.name || '').toLowerCase();
+          const hasMatchingCol = (tableObj?.columns || []).some((col) =>
+            col.name.toLowerCase().includes(query)
+          );
+          const matches = tableName.includes(query) || hasMatchingCol;
           return {
             ...n,
             style: {
@@ -91,9 +95,35 @@ const SchemaFlowInner: React.FC<SchemaFlowCanvasProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, [fitView]);
 
+  const hasTables = schema?.tables && Object.keys(schema.tables).length > 0;
+
+  if (!hasTables) {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100%',
+          color: 'var(--text-muted, #6b7280)',
+          fontSize: 13,
+          gap: 8,
+          padding: 24,
+        }}
+      >
+        <div style={{ fontWeight: 600, color: 'var(--text-secondary, #9ca3af)' }}>
+          No Tables in Schema
+        </div>
+        <div>Create new tables via Query Mode or upload an existing SQLite database.</div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
       <div
+        data-export-ignore="true"
         style={{
           position: 'absolute',
           top: 12,
@@ -112,7 +142,7 @@ const SchemaFlowInner: React.FC<SchemaFlowCanvasProps> = ({
         <Search size={13} color="var(--text-muted, #6b7280)" />
         <input
           type="text"
-          placeholder="Filter tables..."
+          placeholder="Filter tables or columns..."
           aria-label="Filter schema tables"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}

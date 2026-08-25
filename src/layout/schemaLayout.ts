@@ -31,19 +31,27 @@ export function buildSchemaGraph(schema: SchemaModel): SchemaLayoutResult {
     const cardHeight = Math.max(200, 60 + (table.columns?.length || 0) * 26 + 30);
     columnYOffsets[colIndex] += cardHeight;
 
+    const isOrphan = Array.isArray(schema.orphanTables) ? schema.orphanTables.includes(tableName) : false;
+
     nodes.push({
       id: `table_${tableName}`,
       type: 'tableCardNode',
       position: { x, y },
       data: {
         table,
-        isOrphan: schema.orphanTables.includes(tableName),
+        isOrphan,
       },
     });
   });
 
   // Build relationship edges
-  schema.foreignKeys.forEach((fk, index) => {
+  const fks = Array.isArray(schema.foreignKeys)
+    ? schema.foreignKeys
+    : Array.isArray((schema as unknown as { relationships?: unknown[] }).relationships)
+    ? (schema as unknown as { relationships: Array<{ fromTable: string; toTable: string; fromColumn: string; toColumn: string }> }).relationships
+    : [];
+
+  fks.forEach((fk, index) => {
     const sourceNodeId = `table_${fk.fromTable}`;
     const targetNodeId = `table_${fk.toTable}`;
 
