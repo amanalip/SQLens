@@ -1,5 +1,6 @@
 .panel {
-  width: 300px;
+  width: 320px;
+  min-width: 280px;
   height: 100%;
   background: var(--bg-secondary, #161d27);
   border-left: 1px solid var(--border, #2a3649);
@@ -91,14 +92,38 @@
 
 .previewTableWrapper {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 240px;
+  max-width: 100%;
   border: 1px solid var(--border-subtle, #222d3d);
   border-radius: 4px;
   background: var(--bg-primary, #0f141c);
   margin-top: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border, #2a3649) transparent;
+}
+
+.previewTableWrapper::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.previewTableWrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.previewTableWrapper::-webkit-scrollbar-thumb {
+  background: var(--border, #2a3649);
+  border-radius: 3px;
+}
+
+.previewTableWrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--accent, #3b82f6);
 }
 
 .previewTable {
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
   font-size: 11px;
   font-family: 'JetBrains Mono', monospace;
@@ -106,20 +131,21 @@
 
 .previewTable th {
   background: var(--bg-tertiary, #1f2937);
-  padding: 4px 8px;
+  padding: 6px 10px;
   text-align: left;
   border-bottom: 1px solid var(--border, #2a3649);
   color: var(--text-secondary, #9ca3af);
   font-weight: 600;
   white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
 .previewTable td {
-  padding: 4px 8px;
+  padding: 5px 10px;
   border-bottom: 1px solid var(--border-subtle, #222d3d);
   color: var(--text-primary, #f3f4f6);
   white-space: nowrap;
-  max-width: 140px;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
+

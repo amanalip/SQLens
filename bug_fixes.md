@@ -766,35 +766,47 @@
 
 ---
 
-## UI/UX Feature Enhancements Log
+## 88. Horizontally & Vertically Scrollable Sample Data Preview
 
-1. **Application Footer with Author Attribution**: Added footer with `© 2026 - Aman Ali Pogaku` and GitHub account link (`https://github.com/amanalip`).
-2. **Proper Unicode Arrow Typography**: Polished relationship arrows (`→`) across edges, CTE badges, and table cards.
-3. **Extendable Editor Resizers**: Horizontal and vertical splitters allowing dynamic panel resizing with `localStorage` persistence.
-4. **Extend / Collapse Quick Toggle**: Toolbar button to switch between 480px and 800px editor width.
-5. **GitHub Project Navigation Link**: SVG brand icon linking to repository source.
-6. **Dark Mode Canvas Control Styling**: Styled `@xyflow/react` controls and minimap for high contrast in dark mode.
-7. **Live Table Row Counts**: Header pills showing row counts on every schema table card.
-8. **Sample Data Preview in Table Drawer**: 5-row live data preview table for inspected tables.
-9. **Table DDL Syntax Block**: Formatted `CREATE TABLE` syntax view in inspector drawer.
-10. **Column Default Value & Foreign Key Badges**: Inline badges displaying defaults and target references.
-11. **Custom SQLite DB File Upload**: Upload custom `.sqlite` and `.db` files from the top navigation bar.
-12. **230 Verified Example Queries**: 10 curated queries for each of the 23 sample databases.
-13. **Protected String Literal SQL Formatter**: Preserves casing and layout inside single- and double-quoted strings.
-14. **In-Table Real-Time Search / Row Filter**: Filter result table rows in memory with matching row counts.
-15. **Animated Execution Spinner & Progress State**: Clear WebAssembly loading feedback in results pane.
-16. **Clear Results Action Button**: Dismiss query results or error states with one click.
-17. **Visual Subquery Block Cards**: Connected subquery node visualization for nested `WHERE` queries.
-18. **Custom Database Graceful Example Handling**: Clear status indicator for uploaded custom databases.
-19. **Inline Diagnostic Suggestion Badges**: Direct tip badges on diagnostics bar for faster query fixes.
-20. **One-Click Copy SQL to Clipboard**: Copy button in editor toolbar with transient confirmation.
-21. **Column-Name Schema Table Filtering**: Locate schema tables by typing any column name in the search bar.
-22. **Clean Graph PNG Exporting**: Automatic exclusion of search overlays and UI widgets from diagram screenshots.
+- **Issue**: In `src/ui/DetailsPanel/DetailsPanel.module.css`, sample data preview tables with many columns squished table width to 100%, causing rightmost columns to truncate with ellipses.
+- **Fix**: Updated `.previewTable` to `width: max-content; min-width: 100%`, added sticky headers, and added thin scrollbars with full horizontal and vertical overflow support.
+- **Files Modified**:
+  - `src/ui/DetailsPanel/DetailsPanel.module.css`
+  - `tests/sampleDataPreview.test.ts`
 
 ---
 
-## Expanded Test Coverage (39 Test Suites, 128 Tests)
+## UI/UX Feature Enhancements Log
 
+1. **Scrollable Sample Data Previews**: Multi-column live sample data tables scroll horizontally and vertically with sticky column headers.
+2. **Application Footer with Author Attribution**: Added footer with `© 2026 - Aman Ali Pogaku` and GitHub account link (`https://github.com/amanalip`).
+3. **Proper Unicode Arrow Typography**: Polished relationship arrows (`→`) across edges, CTE badges, and table cards.
+4. **Extendable Editor Resizers**: Horizontal and vertical splitters allowing dynamic panel resizing with `localStorage` persistence.
+5. **Extend / Collapse Quick Toggle**: Toolbar button to switch between 480px and 800px editor width.
+6. **GitHub Project Navigation Link**: SVG brand icon linking to repository source.
+7. **Dark Mode Canvas Control Styling**: Styled `@xyflow/react` controls and minimap for high contrast in dark mode.
+8. **Live Table Row Counts**: Header pills showing row counts on every schema table card.
+9. **Sample Data Preview in Table Drawer**: 5-row live data preview table for inspected tables.
+10. **Table DDL Syntax Block**: Formatted `CREATE TABLE` syntax view in inspector drawer.
+11. **Column Default Value & Foreign Key Badges**: Inline badges displaying defaults and target references.
+12. **Custom SQLite DB File Upload**: Upload custom `.sqlite` and `.db` files from the top navigation bar.
+13. **230 Verified Example Queries**: 10 curated queries for each of the 23 sample databases.
+14. **Protected String Literal SQL Formatter**: Preserves casing and layout inside single- and double-quoted strings.
+15. **In-Table Real-Time Search / Row Filter**: Filter result table rows in memory with matching row counts.
+16. **Animated Execution Spinner & Progress State**: Clear WebAssembly loading feedback in results pane.
+17. **Clear Results Action Button**: Dismiss query results or error states with one click.
+18. **Visual Subquery Block Cards**: Connected subquery node visualization for nested `WHERE` queries.
+19. **Custom Database Graceful Example Handling**: Clear status indicator for uploaded custom databases.
+20. **Inline Diagnostic Suggestion Badges**: Direct tip badges on diagnostics bar for faster query fixes.
+21. **One-Click Copy SQL to Clipboard**: Copy button in editor toolbar with transient confirmation.
+22. **Column-Name Schema Table Filtering**: Locate schema tables by typing any column name in the search bar.
+23. **Clean Graph PNG Exporting**: Automatic exclusion of search overlays and UI widgets from diagram screenshots.
+
+---
+
+## Expanded Test Coverage (40 Test Suites, 129 Tests)
+
+- `tests/sampleDataPreview.test.ts`: Validates complete preservation of all table columns across sample preview rows.
 - `tests/footerAndArrow.test.ts`: Formatted relationship arrow glyphs and footer attribution links.
 - `tests/outputNodeSafeRender.test.ts`: Output projection rendering with explicit aliases, empty arrays, and undefined models.
 - `tests/sortLimitSafeRender.test.ts`: Sort direction formatting, column lists, and limit/offset rendering.
