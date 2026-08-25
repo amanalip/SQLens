@@ -1,4 +1,5 @@
-import { chinookSamples, SampleQuery } from './chinook';
+import { SampleQuery } from './types';
+import { chinookSamples } from './chinook';
 import { northwindSamples } from './northwind';
 import { sakilaSamples } from './sakila';
 import { worldSamples } from './world';

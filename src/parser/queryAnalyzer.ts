@@ -169,8 +169,11 @@ export function analyzeAst(ast: unknown, rawSql: string): QueryModel {
     }
   }
 
-  // Process FROM and JOINs
-  const fromList = Array.isArray(node.from) ? node.from : node.from ? [node.from] : [];
+  // Process FROM and JOINs (or target table for INSERT / UPDATE / DELETE)
+  let fromList = Array.isArray(node.from) ? node.from : node.from ? [node.from] : [];
+  if (fromList.length === 0 && node.table) {
+    fromList = Array.isArray(node.table) ? node.table : [node.table];
+  }
   let primaryTable = '';
 
   fromList.forEach((item: Record<string, unknown>, index: number) => {

@@ -144,6 +144,10 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
             isPrimaryKey: boolean;
             isForeignKey: boolean;
             defaultValue?: string;
+            references?: {
+              table: string;
+              column: string;
+            };
           }> = [];
 
           if (colResult && colResult.length > 0) {

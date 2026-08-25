@@ -1,62 +1,64 @@
-import { SampleQuery } from './chinook';
+import { SampleQuery } from './types';
 
 export const flightsSamples: SampleQuery[] = [
   {
-    id: 'fl-1',
-    name: 'Scheduled Flights with Origin and Destination Airports',
-    description: 'Lists flights with airline carriers, route distances, and departure terminals.',
-    sql: `SELECT
-    f.flight_number,
-    al.airline_name,
-    orig.iata_code AS origin,
-    orig.city AS origin_city,
-    dest.iata_code AS destination,
-    dest.city AS dest_city,
-    f.scheduled_departure,
-    f.distance_miles
-FROM flights f
-INNER JOIN airlines al ON f.airline_id = al.airline_id
-INNER JOIN airports orig ON f.origin_airport_id = orig.airport_id
-INNER JOIN airports dest ON f.dest_airport_id = dest.airport_id
-ORDER BY f.scheduled_departure ASC;`,
+    "id": "flights-1",
+    "name": "Airline Flight Volume and Delays",
+    "description": "Calculates total flights and average arrival delays per airline.",
+    "sql": "SELECT\n    a.airline_name,\n    a.iata_code,\n    COUNT(f.flight_id) AS total_flights,\n    ROUND(AVG(f.departure_delay_min), 1) AS avg_dep_delay,\n    ROUND(AVG(f.arrival_delay_min), 1) AS avg_arr_delay\nFROM airlines a\nLEFT JOIN flights f ON a.airline_id = f.airline_id\nGROUP BY a.airline_id, a.airline_name, a.iata_code\nORDER BY total_flights DESC;"
   },
   {
-    id: 'fl-2',
-    name: 'Airline Delay Performance and Cancellation Rates',
-    description: 'Computes average departure delays and on-time percentages by airline.',
-    sql: `SELECT
-    al.airline_name,
-    COUNT(f.flight_id) AS total_flights,
-    ROUND(AVG(f.departure_delay_min), 1) AS avg_dep_delay_min,
-    ROUND(AVG(f.arrival_delay_min), 1) AS avg_arr_delay_min,
-    SUM(CASE WHEN f.status = 'cancelled' THEN 1 ELSE 0 END) AS cancellations
-FROM airlines al
-INNER JOIN flights f ON al.airline_id = f.airline_id
-GROUP BY al.airline_id, al.airline_name
-ORDER BY avg_dep_delay_min ASC;`,
+    "id": "flights-2",
+    "name": "Airport Route Traffic Pairs",
+    "description": "Analyzes flight frequencies between origin and destination airports.",
+    "sql": "SELECT\n    orig.name AS origin_airport,\n    dest.name AS destination_airport,\n    COUNT(f.flight_id) AS flight_frequency,\n    ROUND(AVG(f.distance_miles), 0) AS avg_distance\nFROM flights f\nINNER JOIN airports orig ON f.origin_airport_id = orig.airport_id\nINNER JOIN airports dest ON f.dest_airport_id = dest.airport_id\nGROUP BY f.origin_airport_id, f.dest_airport_id, orig.name, dest.name\nORDER BY flight_frequency DESC\nLIMIT 15;"
   },
   {
-    id: 'fl-3',
-    name: 'Busiest Airport Route Pairs CTE',
-    description: 'Identifies top airport pairs by total flight volume and average seat capacity.',
-    sql: `WITH route_stats AS (
-    SELECT
-        origin_airport_id,
-        dest_airport_id,
-        COUNT(flight_id) AS flight_count,
-        ROUND(AVG(distance_miles), 0) AS route_distance
-    FROM flights
-    GROUP BY origin_airport_id, dest_airport_id
-)
-SELECT
-    orig.iata_code || ' -> ' || dest.iata_code AS route,
-    orig.name AS origin_airport,
-    dest.name AS dest_airport,
-    rs.flight_count,
-    rs.route_distance
-FROM route_stats rs
-INNER JOIN airports orig ON rs.origin_airport_id = orig.airport_id
-INNER JOIN airports dest ON rs.dest_airport_id = dest.airport_id
-ORDER BY rs.flight_count DESC;`,
+    "id": "flights-3",
+    "name": "Long Distance Flights Above Average",
+    "description": "Finds flights with distance exceeding overall route average.",
+    "sql": "SELECT\n    f.flight_number,\n    a.airline_name,\n    f.distance_miles,\n    f.status\nFROM flights f\nINNER JOIN airlines a ON f.airline_id = a.airline_id\nWHERE f.distance_miles > (SELECT AVG(distance_miles) FROM flights)\nORDER BY f.distance_miles DESC\nLIMIT 20;"
   },
+  {
+    "id": "flights-4",
+    "name": "Airport Delay Metrics CTE",
+    "description": "Aggregates departure delay metrics by origin airport hub.",
+    "sql": "WITH hub_delays AS (\n    SELECT\n        ap.name AS airport_name,\n        ap.city,\n        COUNT(f.flight_id) AS departures,\n        AVG(f.departure_delay_min) AS avg_delay\n    FROM airports ap\n    INNER JOIN flights f ON ap.airport_id = f.origin_airport_id\n    GROUP BY ap.airport_id, ap.name, ap.city\n)\nSELECT\n    airport_name,\n    city,\n    departures,\n    ROUND(avg_delay, 1) AS avg_departure_delay_min\nFROM hub_delays\nORDER BY departures DESC;"
+  },
+  {
+    "id": "flights-5",
+    "name": "Flight Delay Rank by Airline",
+    "description": "Ranks arrival delay lengths within each operating carrier.",
+    "sql": "SELECT\n    airline_id,\n    flight_number,\n    arrival_delay_min,\n    RANK() OVER (PARTITION BY airline_id ORDER BY arrival_delay_min DESC) AS delay_rank\nFROM flights\nLIMIT 30;"
+  },
+  {
+    "id": "flights-6",
+    "name": "Flight Status Distribution Matrix",
+    "description": "Breaks down flight operational statuses across schedule.",
+    "sql": "SELECT\n    status,\n    COUNT(flight_id) AS total_flights,\n    ROUND(COUNT(flight_id) * 100.0 / (SELECT COUNT(*) FROM flights), 1) AS pct_of_flights\nFROM flights\nGROUP BY status;"
+  },
+  {
+    "id": "flights-7",
+    "name": "Cumulative Miles Flown by Carrier",
+    "description": "Calculates running distance total per airline across flights.",
+    "sql": "SELECT\n    airline_id,\n    flight_number,\n    distance_miles,\n    SUM(distance_miles) OVER (PARTITION BY airline_id ORDER BY flight_id) AS cumulative_miles\nFROM flights\nLIMIT 25;"
+  },
+  {
+    "id": "flights-8",
+    "name": "Insert New Airport (Add Data)",
+    "description": "Adds a newly operational regional airport terminal.",
+    "sql": "INSERT INTO airports (airport_id, iata_code, name, city, country, timezone)\nVALUES (9901, 'BER', 'Berlin Brandenburg Airport', 'Berlin', 'Germany', 'Europe/Berlin');"
+  },
+  {
+    "id": "flights-9",
+    "name": "Update Flight Status (Modify Data)",
+    "description": "Updates status flags for delayed departures.",
+    "sql": "UPDATE flights\nSET status = 'Delayed'\nWHERE departure_delay_min > 30;"
+  },
+  {
+    "id": "flights-10",
+    "name": "Delete Test Airport (Remove Data)",
+    "description": "Removes the test airport record.",
+    "sql": "DELETE FROM airports\nWHERE airport_id = 9901;"
+  }
 ];

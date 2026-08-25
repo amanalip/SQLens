@@ -547,46 +547,113 @@
 12. **Instant CTE Data Flow Inspection**: CTE nodes display synthesized data flow summaries based on active sources.
 13. **Clean Output Formatting Across Panes**: Results tables, inspector drawers, and canvas nodes render synchronized SQL expressions.
 14. **Action-Appropriate Download Icon in Results Table**: Download CSV button features a dedicated file download glyph instead of a clipboard copy glyph.
-15. **Accessible Inspector Drawer Controls**: Close buttons across inspector drawers include clear tooltips and keyboard accessibility attributes.
-16. **Interactive Line Jump Tooltips**: Diagnostic warnings show contextual tooltips informing users that clicking jumps to the exact error line in the SQL editor.
-17. **Clean Zero-Row Pagination Display**: Results table pagination displays "Page 1 of 1" consistently even on 0-row results.
-18. **Normalized Brand Assets Loading**: Brand detective logo dynamically resolves relative to base URL paths across local, subpath, and root hosting.
-19. **Schema-Qualified Table Explorer**: Full support for schema-qualified table names (`public.users`, `"app"."orders"`) across schema graph rendering and details inspection.
-20. **Robust Node Expression Display**: Graph cards for Aggregate, Filter, Output, and Sort/Limit nodes display formatted expressions and clear fallback states.
-21. **Semantic Color-Coded Minimap Navigation**: Minimap displays distinctive colors per node type (Blue for Tables, Purple for Joins, Amber for Filters, Cyan for Aggregations, Magenta for Sorting, Green for Output, Violet for CTEs).
-22. **Schema Flow Color-Coded Minimap**: Schema minimap highlights connected tables in blue and orphan tables in amber.
-23. **MySQL Comma-Limit Support**: Correctly splits and displays limit count vs offset count when inspecting queries using MySQL `LIMIT offset, count` syntax.
-24. **Clean Graph PNG Export**: PNG exports omit UI overlay controls and minimap while preserving full diagram resolution.
-25. **JSON Output Formatter in Results**: JSON objects and arrays format cleanly in results table cells.
-26. **Table Index Inspector**: Full inspection for table indexes, uniqueness flags, and column lists in the table inspector drawer.
-27. **Overlap-Free Masonry Schema Layout**: Table cards in Schema Mode are placed in dynamic vertical columns that prevent tall tables from colliding.
-28. **Visual Unique Constraint Badges (UQ)**: Schema cards highlight unique keys with cyan `UQ` badges.
-29. **Session Reset Option in Error Boundary**: Recovery button allows users to reset broken state or corrupted hash parameters.
-30. **Chained CTE Ingress Ports**: Visual connection ports allow chaining between sub-pipelines.
-31. **Modal Keyboard Dismissal**: Pressing `Escape` closes the Help and Keyboard Shortcuts modal from anywhere in the app.
-32. **Dynamic Canvas Auto-Centering**: Resizing the window or toggling full screen automatically triggers a smooth graph re-center.
-33. **Advanced Performance Diagnostics**: Visual diagnostics warn about `ORDER BY RANDOM()` and redundant `DISTINCT` + `GROUP BY` patterns.
-34. **Target Handle Docking on Table Nodes**: Visual connections from CTEs and subqueries dock directly into source table cards.
-35. **Query Clear & Reset Button**: Dedicated Clear button in `EditorPane.tsx` to clear editor queries with one click.
-36. **Global Escape Key Dismissal**: `Escape` key listener in `src/App.tsx` to dismiss open node inspection drawers.
-37. **Cursor-Preserving Formatter**: Formatter maintains cursor and line position during keyword formatting.
-38. **Interactive Table Filter in Schema Explorer**: Real-time table search input in `SchemaFlowCanvas.tsx` to highlight matching tables and dim non-matching tables.
-39. **Download CSV & Page Size Controls**: "Download CSV" file export button and a page size selector (10, 25, 50, 100 rows per page) in `ResultsTable.tsx`.
-40. **Active Sort Direction Indicators**: Ascending (`ArrowUp`), descending (`ArrowDown`), and unsorted (`ArrowUpDown`) icons in results table headers.
-41. **Keyboard Shortcuts & Help Dialog**: Help modal in `TopNav.tsx` detailing key shortcuts (`Ctrl+Enter` to run, `Ctrl+Space` for autocomplete, node click inspection).
-42. **Dedicated Sort & Limit Inspector**: Full inspection for `ORDER BY` directions and `LIMIT / OFFSET` numbers in `DetailsPanel.tsx`.
+## 58. TableCardNode Live Row Count and Metadata Badges
+
+- **Issue**: Table cards in Schema Mode did not indicate total rows or default values, requiring users to query tables manually to see table scale.
+- **Fix**: Added live row count badge (`275 rows`), index count badge (`2 idx`), default value badges (`DEF`), and foreign key target references in `TableCardNode.tsx`.
+- **Files Modified**:
+  - `src/graph/nodes/TableCardNode.tsx`
+  - `src/engine/worker.ts`
 
 ---
 
-## Expanded Test Coverage (11 Test Suites, 57 Tests)
+## 59. Schema Inspector Live Sample Data Preview & DDL Syntax
 
+- **Issue**: Inspecting a table in Schema Mode showed only column names and types without sample data or the underlying table DDL script.
+- **Fix**: Added a 5-row live Sample Data Preview table and a formatted `CREATE TABLE` DDL block in `DetailsPanel.tsx`.
+- **Files Modified**:
+  - `src/ui/DetailsPanel/DetailsPanel.tsx`
+  - `src/ui/DetailsPanel/DetailsPanel.module.css`
+  - `src/engine/worker.ts`
+
+---
+
+## 60. Custom SQLite Database Upload Support
+
+- **Issue**: Users could only view pre-bundled sample databases and could not load or explore their own SQLite database files.
+- **Fix**: Added an "Upload DB" button with file picker support for `.sqlite` and `.db` files, loading custom database buffers into the WebAssembly engine and extracting the schema dynamically.
+- **Files Modified**:
+  - `src/ui/TopNav/TopNav.tsx`
+  - `src/App.tsx`
+  - `src/engine/client.ts`
+
+---
+
+## 61. Real-Time Schema Refresh on DDL and DML Mutations
+
+- **Issue**: Running `CREATE TABLE`, `DROP TABLE`, or `ALTER TABLE` in the editor modified SQLite memory but did not immediately refresh the visual Schema canvas.
+- **Fix**: Added automatic schema reload in `handleRunQuery` whenever DDL or DML statements execute.
+- **Files Modified**:
+  - `src/App.tsx`
+
+---
+
+## 62. Query Analyzer AST Extraction for Mutations (INSERT, UPDATE, DELETE)
+
+- **Issue**: In `src/parser/queryAnalyzer.ts`, `INSERT`, `UPDATE`, and `DELETE` queries storing target table references in `ast.table` were not extracted into `model.sources`.
+- **Fix**: Added fallback from `node.from` to `node.table` to populate table sources for all mutation AST models.
+- **Files Modified**:
+  - `src/parser/queryAnalyzer.ts`
+
+---
+
+## 63. 230 Verified Queries Across All 23 Sample Databases
+
+- **Issue**: Previous sample query collection had only 3 to 4 queries per database (72 queries total) without coverage of data modifications or window functions.
+- **Fix**: Expanded all 23 databases to 10 verified queries each (230 total queries) covering filtering, joins, aggregations, subqueries, CTEs, window functions, and data modifications (`INSERT`, `UPDATE`, `DELETE`).
+- **Files Modified**:
+  - `src/samples/chinook.ts`
+  - `src/samples/northwind.ts`
+  - `src/samples/sakila.ts`
+  - `src/samples/world.ts`
+  - `src/samples/employees.ts`
+  - `src/samples/formula1.ts`
+  - `src/samples/classicmodels.ts`
+  - `src/samples/imdb.ts`
+  - `src/samples/spotify.ts`
+  - `src/samples/pokemon.ts`
+  - `src/samples/university.ts`
+  - `src/samples/premierLeague.ts`
+  - `src/samples/ecommerce.ts`
+  - `src/samples/github.ts`
+  - `src/samples/flights.ts`
+  - `src/samples/hospital.ts`
+  - `src/samples/realEstate.ts`
+  - `src/samples/stocks.ts`
+  - `src/samples/foodDelivery.ts`
+  - `src/samples/library.ts`
+  - `src/samples/gaming.ts`
+  - `src/samples/crypto.ts`
+  - `src/samples/hotels.ts`
+  - `src/samples/types.ts`
+  - `src/samples/index.ts`
+
+---
+
+## UI/UX Feature Enhancements Log
+
+1. **Extendable Editor Resizers**: Horizontal and vertical splitters allowing dynamic panel resizing with `localStorage` persistence.
+2. **Extend / Collapse Quick Toggle**: Toolbar button to switch between 480px and 800px editor width.
+3. **GitHub Project Navigation Link**: SVG brand icon linking to repository source.
+4. **Dark Mode Canvas Control Styling**: Styled `@xyflow/react` controls and minimap for high contrast in dark mode.
+5. **Live Table Row Counts**: Header pills showing row counts on every schema table card.
+6. **Sample Data Preview in Table Drawer**: 5-row live data preview table for inspected tables.
+7. **Table DDL Syntax Block**: Formatted `CREATE TABLE` syntax view in inspector drawer.
+8. **Column Default Value & Foreign Key Badges**: Inline badges displaying defaults and target references.
+9. **Custom SQLite DB File Upload**: Upload custom `.sqlite` and `.db` files from the top navigation bar.
+10. **230 Verified Example Queries**: 10 curated queries for each of the 23 sample databases.
+
+---
+
+## Expanded Test Coverage (11 Test Suites, 58 Tests)
+
+- `tests/databaseCatalog.test.ts`: Verifies all 23 databases have 10 queries, validates AST parsing on all 230 queries, and executes all 230 queries against in-memory SQLite instances with 0 errors.
 - `tests/export.test.ts`: CSV generator logic with nulls, booleans, objects, quotes, multiline strings, zero-column edge cases, and empty dataset pagination calculations.
 - `tests/schemaParser.test.ts`: Multi-word data types, composite primary keys, foreign keys, missing indexes, schema-qualified table names.
 - `tests/parser.test.ts`: Query parsing, USING clauses, multiple CTEs, comments handling, empty query handling, circular AST protection, and AST models.
 - `tests/queryAnalyzer.test.ts`: AST analysis for CTEs, joins, aggregations, subqueries in FROM, order by, MySQL comma limit/offset.
 - `tests/dialects.test.ts`: Dialect detection for PostgreSQL, MySQL, and SQLite.
 - `tests/diagnostics.test.ts`: Diagnostics for unbounded mutations, Cartesian joins, star projections, leading wildcards, random sorting, redundant distinct, syntax errors, and USING clauses.
-- `tests/databaseCatalog.test.ts`: Verifies all 23 database sample queries parse without syntax errors.
 - `tests/theme.test.ts`: Validates light and dark theme palettes, contrast, and CSS variables.
 - `tests/schemaLayout.test.ts`: Graph layout, distinct handle IDs, orphan tables.
 - `tests/urlState.test.ts`: Codec encoding, hash prefixes, corruption handling, whitespace trimming, percent-encoding.

@@ -1,60 +1,64 @@
-import { SampleQuery } from './chinook';
+import { SampleQuery } from './types';
 
 export const hospitalSamples: SampleQuery[] = [
   {
-    id: 'hosp-1',
-    name: 'Patient Admissions and Attending Physicians',
-    description: 'Retrieves patient admissions with attending doctor names, room numbers, and departments.',
-    sql: `SELECT
-    p.first_name || ' ' || p.last_name AS patient_name,
-    p.gender,
-    d.first_name || ' ' || d.last_name AS doctor_name,
-    dept.name AS department,
-    a.admission_date,
-    a.discharge_date,
-    a.room_number
-FROM admissions a
-INNER JOIN patients p ON a.patient_id = p.patient_id
-INNER JOIN doctors d ON a.attending_doctor_id = d.doctor_id
-INNER JOIN departments dept ON d.dept_id = dept.dept_id
-ORDER BY a.admission_date DESC;`,
+    "id": "hospital-1",
+    "name": "Department Bed Occupancy and Staff",
+    "description": "Calculates doctor headcounts and capacity metrics by clinical department.",
+    "sql": "SELECT\n    dept.name AS department_name,\n    dept.head_doctor,\n    dept.bed_capacity,\n    COUNT(doc.doctor_id) AS assigned_doctors\nFROM departments dept\nLEFT JOIN doctors doc ON dept.dept_id = doc.dept_id\nGROUP BY dept.dept_id, dept.name, dept.head_doctor, dept.bed_capacity\nORDER BY dept.bed_capacity DESC;"
   },
   {
-    id: 'hosp-2',
-    name: 'Department Admissions and Bed Occupancy',
-    description: 'Calculates active admissions and bed capacity totals per hospital department.',
-    sql: `SELECT
-    dept.name AS department,
-    dept.head_doctor,
-    dept.bed_capacity,
-    COUNT(a.admission_id) AS total_admissions,
-    SUM(CASE WHEN a.discharge_date IS NULL THEN 1 ELSE 0 END) AS current_inpatients
-FROM departments dept
-LEFT JOIN doctors d ON dept.dept_id = d.dept_id
-LEFT JOIN admissions a ON d.doctor_id = a.attending_doctor_id
-GROUP BY dept.dept_id, dept.name, dept.head_doctor, dept.bed_capacity
-ORDER BY total_admissions DESC;`,
+    "id": "hospital-2",
+    "name": "Patient Admissions and Diagnoses",
+    "description": "Lists patient admission records with attending doctor details.",
+    "sql": "SELECT\n    p.first_name || ' ' || p.last_name AS patient_name,\n    p.gender,\n    p.blood_type,\n    adm.admission_date,\n    adm.diagnosis,\n    doc.first_name || ' ' || doc.last_name AS attending_doctor\nFROM admissions adm\nINNER JOIN patients p ON adm.patient_id = p.patient_id\nINNER JOIN doctors doc ON adm.attending_doctor_id = doc.doctor_id\nORDER BY adm.admission_date DESC\nLIMIT 15;"
   },
   {
-    id: 'hosp-3',
-    name: 'Most Prescribed Medications and Costs CTE',
-    description: 'Ranks prescribed medications by dosage frequencies and total pharmacy costs.',
-    sql: `WITH medication_costs AS (
-    SELECT
-        m.name AS medication_name,
-        m.category,
-        COUNT(pr.prescription_id) AS times_prescribed,
-        ROUND(SUM(m.unit_cost * pr.quantity), 2) AS total_cost
-    FROM prescriptions pr
-    INNER JOIN medications m ON pr.medication_id = m.medication_id
-    GROUP BY m.medication_id, m.name, m.category
-)
-SELECT
-    medication_name,
-    category,
-    times_prescribed,
-    total_cost
-FROM medication_costs
-ORDER BY total_cost DESC;`,
+    "id": "hospital-3",
+    "name": "Expensive Medication Prescriptions",
+    "description": "Finds prescribed medications with unit costs above pharmaceutical average.",
+    "sql": "SELECT\n    m.name AS medication_name,\n    m.category,\n    m.unit_cost,\n    pr.dosage,\n    pr.quantity\nFROM prescriptions pr\nINNER JOIN medications m ON pr.medication_id = m.medication_id\nWHERE m.unit_cost > (SELECT AVG(unit_cost) FROM medications)\nORDER BY m.unit_cost DESC;"
   },
+  {
+    "id": "hospital-4",
+    "name": "Doctor Patient Load CTE",
+    "description": "Aggregates patient admission caseloads per attending physician.",
+    "sql": "WITH doctor_caseload AS (\n    SELECT\n        d.doctor_id,\n        d.first_name || ' ' || d.last_name AS doctor_name,\n        d.specialty,\n        COUNT(a.admission_id) AS total_patients\n    FROM doctors d\n    LEFT JOIN admissions a ON d.doctor_id = a.attending_doctor_id\n    GROUP BY d.doctor_id, d.first_name, d.last_name, d.specialty\n)\nSELECT\n    doctor_name,\n    specialty,\n    total_patients\nFROM doctor_caseload\nORDER BY total_patients DESC;"
+  },
+  {
+    "id": "hospital-5",
+    "name": "Doctor Patient Ranking by Specialty",
+    "description": "Ranks physicians by total admission count within their specialty.",
+    "sql": "SELECT\n    specialty,\n    first_name || ' ' || last_name AS doctor_name,\n    COUNT(a.admission_id) AS patient_count,\n    RANK() OVER (PARTITION BY specialty ORDER BY COUNT(a.admission_id) DESC) AS specialty_rank\nFROM doctors d\nLEFT JOIN admissions a ON d.doctor_id = a.attending_doctor_id\nGROUP BY d.doctor_id, specialty, first_name, last_name\nLIMIT 25;"
+  },
+  {
+    "id": "hospital-6",
+    "name": "Medication Category Cost Summary",
+    "description": "Summarizes pharmaceutical inventory unit costs across categories.",
+    "sql": "SELECT\n    category,\n    COUNT(medication_id) AS drug_count,\n    ROUND(AVG(unit_cost), 2) AS avg_unit_cost,\n    MAX(unit_cost) AS max_unit_cost\nFROM medications\nGROUP BY category\nORDER BY avg_unit_cost DESC;"
+  },
+  {
+    "id": "hospital-7",
+    "name": "Cumulative Prescription Costs",
+    "description": "Calculates running expenditure on prescribed medications.",
+    "sql": "SELECT\n    prescription_id,\n    admission_id,\n    quantity,\n    SUM(quantity) OVER (PARTITION BY admission_id ORDER BY prescription_id) AS running_quantity\nFROM prescriptions\nLIMIT 25;"
+  },
+  {
+    "id": "hospital-8",
+    "name": "Insert New Patient (Add Data)",
+    "description": "Registers a new clinical patient intake record.",
+    "sql": "INSERT INTO patients (patient_id, first_name, last_name, date_of_birth, gender, blood_type)\nVALUES (9901, 'Elena', 'Rostova', '1988-06-21', 'F', 'O+');"
+  },
+  {
+    "id": "hospital-9",
+    "name": "Update Bed Capacity (Modify Data)",
+    "description": "Increases capacity for Intensive Care Unit.",
+    "sql": "UPDATE departments\nSET bed_capacity = bed_capacity + 10\nWHERE name = 'Intensive Care';"
+  },
+  {
+    "id": "hospital-10",
+    "name": "Delete Test Patient (Remove Data)",
+    "description": "Removes the test patient record.",
+    "sql": "DELETE FROM patients\nWHERE patient_id = 9901;"
+  }
 ];
