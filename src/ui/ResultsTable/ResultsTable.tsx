@@ -46,6 +46,12 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
   const [sorting, setSorting] = useState<SortingState>([]);
   const [copied, setCopied] = useState(false);
   const [filterQuery, setFilterQuery] = useState('');
+  const [prevResult, setPrevResult] = useState<QueryExecutionResult | null>(result);
+
+  if (result !== prevResult) {
+    setPrevResult(result);
+    setFilterQuery('');
+  }
 
   const columns = useMemo<ColumnDef<Record<string, unknown>>[]>(() => {
     if (!result || !result.columns) return [];
@@ -107,11 +113,12 @@ export const ResultsTable: React.FC<ResultsTableProps> = ({
   });
 
   const generateCsv = (): string => {
-    if (!result || result.columns.length === 0) return '';
+    if (!result || !Array.isArray(result.columns) || result.columns.length === 0) return '';
     const header = result.columns.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(',');
-    const rows = result.values
+    const valuesList = Array.isArray(result.values) ? result.values : [];
+    const rows = valuesList
       .map((row) =>
-        row
+        (Array.isArray(row) ? row : [])
           .map((cell) => {
             if (cell === null || cell === undefined) return '';
             if (typeof cell === 'number') return String(cell);

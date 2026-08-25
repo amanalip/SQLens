@@ -18,11 +18,17 @@ export function parseSQL(sql: string, userDialect?: SQLDialect): ParseResult {
   const dialect = userDialect || detectDialect(trimmed);
   const diagnostics: DiagnosticWarning[] = [];
 
-  if (!trimmed) {
+  // Strip line comments and block comments to test if query contains actual SQL
+  const strippedSql = trimmed
+    .replace(/--.*$/gm, '')
+    .replace(/\/\*[\s\S]*?\*\//g, '')
+    .trim();
+
+  if (!strippedSql) {
     return {
       model: {
         id: 'empty',
-        rawSql: '',
+        rawSql: trimmed,
         queryType: 'UNKNOWN',
         ctes: [],
         sources: [],

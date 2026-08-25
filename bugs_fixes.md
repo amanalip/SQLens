@@ -681,13 +681,33 @@
 
 ---
 
-## 76. Details Panel Relationship Glyph Rendering
+## 77. Comment-Only SQL Query Parsing Guard
 
-- **Issue**: In `src/ui/DetailsPanel/DetailsPanel.tsx`, relationship links and column references rendered raw text `-&gt;` instead of unicode arrows.
-- **Fix**: Replaced raw entity strings with clean unicode arrows (`→`).
+- **Issue**: In `src/parser/parser.ts`, submitting an SQL query with only line or block comments caused `node-sql-parser` to fail with a syntax error diagnostic instead of returning an empty query model.
+- **Fix**: Stripped line comments and block comments before empty query checks and returned an empty `QueryModel` with zero error diagnostics.
 - **Files Modified**:
-  - `src/ui/DetailsPanel/DetailsPanel.tsx`
-  - `tests/detailsPanelFormat.test.ts`
+  - `src/parser/parser.ts`
+  - `tests/commentOnlyQuery.test.ts`
+
+---
+
+## 78. Automatic In-Table Search Filter Synchronization
+
+- **Issue**: In `src/ui/ResultsTable/ResultsTable.tsx`, searching rows retained stale search queries when subsequent queries with different column names were executed, unintentionally hiding new query results.
+- **Fix**: Synchronized state to clear `filterQuery` whenever query execution results change.
+- **Files Modified**:
+  - `src/ui/ResultsTable/ResultsTable.tsx`
+  - `tests/resultsTableReset.test.ts`
+
+---
+
+## 79. Sparse Dataset CSV Export Validation
+
+- **Issue**: In `src/ui/ResultsTable/ResultsTable.tsx`, exporting queries with sparse, non-array, or null rows could produce malformed CSV lines.
+- **Fix**: Added defensive array mapping and cell type sanitization in `generateCsv`.
+- **Files Modified**:
+  - `src/ui/ResultsTable/ResultsTable.tsx`
+  - `tests/csvSparseExport.test.ts`
 
 ---
 
@@ -716,8 +736,13 @@
 
 ---
 
-## Expanded Test Coverage (23 Test Suites, 95 Tests)
+## Expanded Test Coverage (28 Test Suites, 107 Tests)
 
+- `tests/commentOnlyQuery.test.ts`: Graceful handling of comment-only and whitespace-only queries with 0 error diagnostics.
+- `tests/resultsTableReset.test.ts`: In-table search filter auto-reset on query execution result changes.
+- `tests/csvSparseExport.test.ts`: Safe CSV generation for sparse rows, missing arrays, and null cells.
+- `tests/emptyQueryDiagnostics.test.ts`: Empty query model structure and diagnostics array verification.
+- `tests/paginationState.test.ts`: Page size calculation, total page counts, and boundary clamping.
 - `tests/errorBoundaryReset.test.ts`: Complete cleanup of theme and panel layout dimensions during recovery reset.
 - `tests/detailsPanelFormat.test.ts`: Relationship glyph and column target reference path formatting.
 - `tests/dialectsLiteralProtection.test.ts`: Dialect signature detection with string literal stripping and URL immunity.
