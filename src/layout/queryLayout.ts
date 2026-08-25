@@ -30,7 +30,7 @@ export function buildQueryGraph(model: QueryModel): LayoutResult {
             cte.model?.sources?.length
               ? cte.model.sources.map((s) => s.name).join(', ')
               : 'VALUES'
-          } -> (${cte.name})`,
+          } → (${cte.name})`,
         },
       });
       cteYOffset += 140;

@@ -54,7 +54,7 @@ export const TableCardNode: React.FC<NodeProps> = ({ data, selected }) => {
         {table.columns && table.columns.length > 0 ? (
           table.columns.map((col) => {
             const handleId = `${table.name}_${col.name}`;
-            const refText = col.references ? ` -> ${col.references.table}.${col.references.column}` : '';
+            const refText = col.references ? ` → ${col.references.table}.${col.references.column}` : '';
             const defText = col.defaultValue !== undefined ? ` (DEFAULT ${col.defaultValue})` : '';
             const tooltip = `${col.name} (${col.type})${col.isPrimaryKey ? ' - Primary Key' : ''}${
               col.isForeignKey ? ` - Foreign Key${refText}` : ''

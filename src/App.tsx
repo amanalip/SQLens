@@ -379,6 +379,31 @@ export function App() {
           onClose={() => setSelectedNode(null)}
         />
       </div>
+
+      <footer className={styles.appFooter}>
+        <div className={styles.footerLeft}>
+          <span>© 2026 - Aman Ali Pogaku</span>
+          <span className={styles.footerDivider}>•</span>
+          <a
+            href="https://github.com/amanalip"
+            target="_blank"
+            rel="noreferrer"
+            className={styles.footerLink}
+          >
+            github.com/amanalip
+          </a>
+        </div>
+        <div className={styles.footerRight}>
+          <a
+            href="https://github.com/amanalip/SQLens"
+            target="_blank"
+            rel="noreferrer"
+            className={styles.footerLink}
+          >
+            SQLens GitHub
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }

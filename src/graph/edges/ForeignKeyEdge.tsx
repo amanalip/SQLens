@@ -23,7 +23,8 @@ export const ForeignKeyEdge: React.FC<EdgeProps> = ({
     borderRadius: 8,
   });
 
-  const label = (data as { label?: string })?.label;
+  const rawLabel = (data as { label?: string })?.label;
+  const label = rawLabel ? rawLabel.replace(/->/g, '→') : undefined;
 
   return (
     <>

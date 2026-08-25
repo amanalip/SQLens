@@ -67,7 +67,7 @@ export function buildSchemaGraph(schema: SchemaModel): SchemaLayoutResult {
         data: {
           fromCol: fk.fromColumn,
           toCol: fk.toColumn,
-          label: `${fk.fromColumn} -> ${fk.toColumn}`,
+          label: `${fk.fromColumn} → ${fk.toColumn}`,
         },
         markerEnd: {
           type: MarkerType.ArrowClosed,

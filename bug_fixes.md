@@ -741,43 +741,49 @@
 
 ---
 
-## 85. Aggregate Node Safe Column Formatting
+## 86. Relationship Edge and Tooltip Arrow Typography
 
-- **Issue**: In `src/graph/nodes/AggregateNode.tsx`, rendering aggregate keys when `columns` array was missing or empty produced blank snippet lines.
-- **Fix**: Added fallback to default group expression or `'ALL'` for full-dataset aggregations.
+- **Issue**: Foreign key edge labels in `src/layout/schemaLayout.ts`, CTE flow summaries in `src/layout/queryLayout.ts`, and table card tooltip references in `src/graph/nodes/TableCardNode.tsx` used raw ASCII `->` text rather than properly shaped unicode arrows.
+- **Fix**: Replaced all instances of `->` with `→` in `schemaLayout.ts`, `queryLayout.ts`, `TableCardNode.tsx`, and `ForeignKeyEdge.tsx`.
 - **Files Modified**:
-  - `src/graph/nodes/AggregateNode.tsx`
-  - `tests/aggregateNodeSafeRender.test.ts`
+  - `src/layout/schemaLayout.ts`
+  - `src/layout/queryLayout.ts`
+  - `src/graph/nodes/TableCardNode.tsx`
+  - `src/graph/edges/ForeignKeyEdge.tsx`
+  - `tests/footerAndArrow.test.ts`
 
 ---
 
 ## UI/UX Feature Enhancements Log
 
-1. **Extendable Editor Resizers**: Horizontal and vertical splitters allowing dynamic panel resizing with `localStorage` persistence.
-2. **Extend / Collapse Quick Toggle**: Toolbar button to switch between 480px and 800px editor width.
-3. **GitHub Project Navigation Link**: SVG brand icon linking to repository source.
-4. **Dark Mode Canvas Control Styling**: Styled `@xyflow/react` controls and minimap for high contrast in dark mode.
-5. **Live Table Row Counts**: Header pills showing row counts on every schema table card.
-6. **Sample Data Preview in Table Drawer**: 5-row live data preview table for inspected tables.
-7. **Table DDL Syntax Block**: Formatted `CREATE TABLE` syntax view in inspector drawer.
-8. **Column Default Value & Foreign Key Badges**: Inline badges displaying defaults and target references.
-9. **Custom SQLite DB File Upload**: Upload custom `.sqlite` and `.db` files from the top navigation bar.
-10. **230 Verified Example Queries**: 10 curated queries for each of the 23 sample databases.
-11. **Protected String Literal SQL Formatter**: Preserves casing and layout inside single- and double-quoted strings.
-12. **In-Table Real-Time Search / Row Filter**: Filter result table rows in memory with matching row counts.
-13. **Animated Execution Spinner & Progress State**: Clear WebAssembly loading feedback in results pane.
-14. **Clear Results Action Button**: Dismiss query results or error states with one click.
-15. **Visual Subquery Block Cards**: Connected subquery node visualization for nested `WHERE` queries.
-16. **Custom Database Graceful Example Handling**: Clear status indicator for uploaded custom databases.
-17. **Inline Diagnostic Suggestion Badges**: Direct tip badges on diagnostics bar for faster query fixes.
-18. **One-Click Copy SQL to Clipboard**: Copy button in editor toolbar with transient confirmation.
-19. **Column-Name Schema Table Filtering**: Locate schema tables by typing any column name in the search bar.
-20. **Clean Graph PNG Exporting**: Automatic exclusion of search overlays and UI widgets from diagram screenshots.
+1. **Application Footer with Author Attribution**: Added footer with `© 2026 - Aman Ali Pogaku` and GitHub account link (`https://github.com/amanalip`).
+2. **Proper Unicode Arrow Typography**: Polished relationship arrows (`→`) across edges, CTE badges, and table cards.
+3. **Extendable Editor Resizers**: Horizontal and vertical splitters allowing dynamic panel resizing with `localStorage` persistence.
+4. **Extend / Collapse Quick Toggle**: Toolbar button to switch between 480px and 800px editor width.
+5. **GitHub Project Navigation Link**: SVG brand icon linking to repository source.
+6. **Dark Mode Canvas Control Styling**: Styled `@xyflow/react` controls and minimap for high contrast in dark mode.
+7. **Live Table Row Counts**: Header pills showing row counts on every schema table card.
+8. **Sample Data Preview in Table Drawer**: 5-row live data preview table for inspected tables.
+9. **Table DDL Syntax Block**: Formatted `CREATE TABLE` syntax view in inspector drawer.
+10. **Column Default Value & Foreign Key Badges**: Inline badges displaying defaults and target references.
+11. **Custom SQLite DB File Upload**: Upload custom `.sqlite` and `.db` files from the top navigation bar.
+12. **230 Verified Example Queries**: 10 curated queries for each of the 23 sample databases.
+13. **Protected String Literal SQL Formatter**: Preserves casing and layout inside single- and double-quoted strings.
+14. **In-Table Real-Time Search / Row Filter**: Filter result table rows in memory with matching row counts.
+15. **Animated Execution Spinner & Progress State**: Clear WebAssembly loading feedback in results pane.
+16. **Clear Results Action Button**: Dismiss query results or error states with one click.
+17. **Visual Subquery Block Cards**: Connected subquery node visualization for nested `WHERE` queries.
+18. **Custom Database Graceful Example Handling**: Clear status indicator for uploaded custom databases.
+19. **Inline Diagnostic Suggestion Badges**: Direct tip badges on diagnostics bar for faster query fixes.
+20. **One-Click Copy SQL to Clipboard**: Copy button in editor toolbar with transient confirmation.
+21. **Column-Name Schema Table Filtering**: Locate schema tables by typing any column name in the search bar.
+22. **Clean Graph PNG Exporting**: Automatic exclusion of search overlays and UI widgets from diagram screenshots.
 
 ---
 
-## Expanded Test Coverage (38 Test Suites, 126 Tests)
+## Expanded Test Coverage (39 Test Suites, 128 Tests)
 
+- `tests/footerAndArrow.test.ts`: Formatted relationship arrow glyphs and footer attribution links.
 - `tests/outputNodeSafeRender.test.ts`: Output projection rendering with explicit aliases, empty arrays, and undefined models.
 - `tests/sortLimitSafeRender.test.ts`: Sort direction formatting, column lists, and limit/offset rendering.
 - `tests/aggregateNodeSafeRender.test.ts`: Raw aggregate expressions and column fallback formatting.
