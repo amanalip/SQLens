@@ -50,7 +50,7 @@ export const ForeignKeyEdge: React.FC<EdgeProps> = ({
               padding: '2px 8px',
               borderRadius: 4,
               fontSize: 11,
-              fontFamily: 'monospace',
+              fontFamily: 'var(--font-mono)',
               color: 'var(--text-secondary, #9ca3af)',
               pointerEvents: 'none',
               userSelect: 'none',

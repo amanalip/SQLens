@@ -161,7 +161,7 @@ export const DetailsPanel: React.FC<DetailsPanelProps> = ({ selectedNode, onClos
           {table.ddlSql && (
             <div className={styles.section}>
               <div className={styles.sectionTitle}>Table DDL Definition</div>
-              <div className={styles.codeBlock} style={{ fontSize: 10, lineHeight: 1.4 }}>
+              <div className={styles.codeBlock}>
                 {table.ddlSql}
               </div>
             </div>
