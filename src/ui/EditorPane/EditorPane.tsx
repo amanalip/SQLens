@@ -143,7 +143,7 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
               caretColor: 'var(--accent, #3b82f6)',
               fontFamily: 'var(--font-mono)',
               fontSize: '13.5px',
-              fontWeight: '430',
+              fontWeight: '500',
               lineHeight: '1.55',
               padding: '10px 0',
             },
