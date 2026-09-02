@@ -6,7 +6,7 @@
   height: 52px;
   background: var(--bg-primary, #0f141c);
   border-bottom: 1px solid var(--border, #2a3649);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
   color: var(--text-primary, #f3f4f6);
   user-select: none;
   z-index: 20;
