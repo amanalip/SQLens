@@ -136,18 +136,23 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
           EditorView.theme({
             '&': {
               height: '100%',
-              backgroundColor: 'var(--bg-secondary, #161d27)',
+              backgroundColor: 'var(--bg-card, #1a222f)',
               color: 'var(--text-primary, #f3f4f6)',
             },
             '.cm-content': {
               caretColor: 'var(--accent, #3b82f6)',
-              fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
-              padding: '8px 0',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '13.5px',
+              fontWeight: '430',
+              lineHeight: '1.55',
+              padding: '10px 0',
             },
             '.cm-gutters': {
-              backgroundColor: 'var(--bg-primary, #0f141c)',
-              color: 'var(--text-muted, #6b7280)',
+              backgroundColor: 'var(--bg-secondary, #161d27)',
+              color: 'var(--text-secondary, #9ca3af)',
               borderRight: '1px solid var(--border, #2a3649)',
+              fontFamily: 'var(--font-mono)',
+              fontSize: '12px',
             },
             '.cm-activeLine': {
               backgroundColor: 'rgba(255, 255, 255, 0.04)',

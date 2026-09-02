@@ -74,8 +74,11 @@
   flex: 1;
   height: 100%;
   overflow: auto;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
-  font-size: 13px;
+  font-family: var(--font-mono);
+  font-size: 13.5px;
+  font-weight: 430;
+  line-height: 1.55;
+  font-variant-ligatures: none;
 }
 
 .editorCanvas :global(.cm-editor) {
@@ -85,4 +88,5 @@
 .editorCanvas :global(.cm-scroller) {
   overflow: auto;
   font-family: inherit;
+  line-height: inherit;
 }
