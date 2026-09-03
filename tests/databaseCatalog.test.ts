@@ -6,14 +6,14 @@ import { bundledDatabases } from '../src/samples';
 import { parseSQL } from '../src/parser/parser';
 
 describe('Database Catalog & Sample Queries Verification', () => {
-  it('contains 23 registered databases with 10 verified queries each', () => {
+  it('contains 23 registered databases with 20 verified queries each', () => {
     expect(bundledDatabases.length).toBe(23);
     bundledDatabases.forEach((db) => {
-      expect(db.samples.length).toBe(10);
+      expect(db.samples.length).toBe(20);
     });
   });
 
-  it('verifies all 230 sample queries parse into valid AST models', () => {
+  it('verifies all 460 sample queries parse into valid AST models', () => {
     let totalQueries = 0;
     bundledDatabases.forEach((db) => {
       db.samples.forEach((sample) => {
@@ -24,10 +24,10 @@ describe('Database Catalog & Sample Queries Verification', () => {
         expect(res.model.sources.length).toBeGreaterThan(0);
       });
     });
-    expect(totalQueries).toBe(230);
+    expect(totalQueries).toBe(460);
   });
 
-  it('executes all 230 sample queries against live in-memory SQLite databases with zero errors', async () => {
+  it('executes all 460 sample queries against live in-memory SQLite databases with zero errors', async () => {
     const SQL = await initSqlJs();
     const dbDir = path.resolve(__dirname, '../public/databases');
 
