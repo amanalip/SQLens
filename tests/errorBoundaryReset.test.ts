@@ -11,12 +11,14 @@ describe('Error Boundary Session Reset Keys', () => {
     delete mockStorage['sqlens_theme'];
     delete mockStorage['sqlens_editor_width'];
     delete mockStorage['sqlens_results_height'];
+    delete mockStorage['sqlens_editor_wrap'];
   }
 
   it('clears theme and panel layout dimensions from storage', () => {
     mockStorage['sqlens_theme'] = 'light';
     mockStorage['sqlens_editor_width'] = '650';
     mockStorage['sqlens_results_height'] = '320';
+    mockStorage['sqlens_editor_wrap'] = 'false';
     mockStorage['unrelated_key'] = 'keep_me';
 
     resetSession();
@@ -24,6 +26,7 @@ describe('Error Boundary Session Reset Keys', () => {
     expect(mockStorage['sqlens_theme']).toBeUndefined();
     expect(mockStorage['sqlens_editor_width']).toBeUndefined();
     expect(mockStorage['sqlens_results_height']).toBeUndefined();
+    expect(mockStorage['sqlens_editor_wrap']).toBeUndefined();
     expect(mockStorage['unrelated_key']).toBe('keep_me');
   });
 });
