@@ -12,7 +12,7 @@ import { sql, SQLite } from '@codemirror/lang-sql';
 import { autocompletion, closeBrackets } from '@codemirror/autocomplete';
 import { setDiagnostics, Diagnostic } from '@codemirror/lint';
 import { oneDark } from '@codemirror/theme-one-dark';
-import { Play, Upload, Sparkles, RotateCcw, Maximize2, Minimize2 } from 'lucide-react';
+import { Play, Upload, Sparkles, RotateCcw, Maximize2, Minimize2, WrapText } from 'lucide-react';
 import { DiagnosticWarning } from '../../model/diagnostics';
 import { SchemaModel } from '../../model/schema';
 import styles from './EditorPane.module.css';
@@ -41,7 +41,11 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
     const editorViewRef = useRef<EditorView | null>(null);
     const schemaCompartment = useRef(new Compartment());
     const themeCompartment = useRef(new Compartment());
+    const wrappingCompartment = useRef(new Compartment());
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isWrapping, setIsWrapping] = React.useState(() => {
+      return localStorage.getItem('sqlens_editor_wrap') !== 'false';
+    });
 
     const onRunQueryRef = useRef(onRunQuery);
     onRunQueryRef.current = onRunQuery;
@@ -132,6 +136,7 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
             })
           ),
           themeCompartment.current.of(theme === 'dark' ? oneDark : []),
+          wrappingCompartment.current.of(isWrapping ? EditorView.lineWrapping : []),
           updateListener,
           EditorView.theme({
             '&': {
@@ -327,6 +332,18 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
       setTimeout(() => setCopiedSql(false), 2000);
     };
 
+    const handleToggleWrap = () => {
+      const nextWrapping = !isWrapping;
+      setIsWrapping(nextWrapping);
+      localStorage.setItem('sqlens_editor_wrap', String(nextWrapping));
+
+      editorViewRef.current?.dispatch({
+        effects: wrappingCompartment.current.reconfigure(
+          nextWrapping ? EditorView.lineWrapping : []
+        ),
+      });
+    };
+
     // File upload handler
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
       const file = event.target.files?.[0];
@@ -393,6 +410,18 @@ export const EditorPane = forwardRef<EditorPaneRef, EditorPaneProps>(
               <Upload size={13} />
               <span>Open</span>
             </button>
+
+            <button
+              className={`${styles.toolButton} ${isWrapping ? styles.activeToolButton : ''}`}
+              onClick={handleToggleWrap}
+              aria-label={isWrapping ? 'Disable SQL editor word wrap' : 'Enable SQL editor word wrap'}
+              aria-pressed={isWrapping}
+              title={isWrapping ? 'Disable word wrap' : 'Enable word wrap'}
+            >
+              <WrapText size={13} />
+              <span>Wrap</span>
+            </button>
+
             <input
               type="file"
               ref={fileInputRef}
