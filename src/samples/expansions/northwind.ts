@@ -1,5 +1,5 @@
 import { SampleQuery } from '../types';
-import { sample, profileSamples } from './helpers';
+import { sample } from './helpers';
 
 export const northwindExpansion: SampleQuery[] = [
   sample('northwind-11', 'Discount Cost by Country', 'Estimates the sales value given up to discounts in each shipping country.', `SELECT o.ship_country,

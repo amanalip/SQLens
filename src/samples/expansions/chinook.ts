@@ -1,5 +1,5 @@
 import { SampleQuery } from '../types';
-import { sample, profileSamples } from './helpers';
+import { sample } from './helpers';
 
 export const chinookExpansion: SampleQuery[] = [
   sample('chinook-11', 'Customers Without Purchases', 'Finds customer accounts that have never placed an order.', `SELECT c.customer_id, c.first_name, c.last_name, c.country

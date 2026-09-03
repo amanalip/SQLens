@@ -1,5 +1,5 @@
 import { SampleQuery } from '../types';
-import { sample, profileSamples } from './helpers';
+import { sample } from './helpers';
 
 export const worldExpansion: SampleQuery[] = [
   sample('world-11', 'Capital City Population Share', 'Measures how much of each country population lives in its capital.', `SELECT co.name AS country, ci.name AS capital, ci.population AS capital_population,

@@ -22,6 +22,7 @@ import { librarySamples } from './library';
 import { gamingSamples } from './gaming';
 import { cryptoSamples } from './crypto';
 import { hotelsSamples } from './hotels';
+import { sampleExpansions } from './expansions';
 
 export {
   chinookSamples,
@@ -61,6 +62,11 @@ export interface BundledDatabase {
   samples: SampleQuery[];
 }
 
+const completeCatalog = (id: string, baseSamples: SampleQuery[]): SampleQuery[] => [
+  ...baseSamples,
+  ...(sampleExpansions[id] || []),
+];
+
 export const bundledDatabases: BundledDatabase[] = [
   {
     id: 'chinook',
@@ -69,7 +75,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1 MB',
     bestFor: 'JOINs, GROUP BY, subqueries',
     filename: './databases/chinook.sqlite',
-    samples: chinookSamples,
+    samples: completeCatalog('chinook', chinookSamples),
   },
   {
     id: 'northwind',
@@ -78,7 +84,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1.5 MB',
     bestFor: 'Multi-table JOINs, aggregations',
     filename: './databases/northwind.sqlite',
-    samples: northwindSamples,
+    samples: completeCatalog('northwind', northwindSamples),
   },
   {
     id: 'sakila',
@@ -87,7 +93,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~2 MB',
     bestFor: 'Complex JOINs, date math',
     filename: './databases/sakila.sqlite',
-    samples: sakilaSamples,
+    samples: completeCatalog('sakila', sakilaSamples),
   },
   {
     id: 'world',
@@ -96,7 +102,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~400 KB',
     bestFor: 'Simple queries, WHERE, sorting',
     filename: './databases/world.sqlite',
-    samples: worldSamples,
+    samples: completeCatalog('world', worldSamples),
   },
   {
     id: 'employees',
@@ -105,7 +111,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~500 KB',
     bestFor: 'Window functions, CTEs, self-joins',
     filename: './databases/employees.sqlite',
-    samples: employeesSamples,
+    samples: completeCatalog('employees', employeesSamples),
   },
   {
     id: 'formula1',
@@ -114,7 +120,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1.5 MB',
     bestFor: 'Ranking, multi-table joins, analytics',
     filename: './databases/formula1.sqlite',
-    samples: formula1Samples,
+    samples: completeCatalog('formula1', formula1Samples),
   },
   {
     id: 'classicmodels',
@@ -123,7 +129,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1 MB',
     bestFor: 'B2B sales reporting, balances, hierarchies',
     filename: './databases/classicmodels.sqlite',
-    samples: classicmodelsSamples,
+    samples: completeCatalog('classicmodels', classicmodelsSamples),
   },
   {
     id: 'imdb',
@@ -132,7 +138,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1 MB',
     bestFor: 'Text search, ratings, filmography stats',
     filename: './databases/imdb.sqlite',
-    samples: imdbSamples,
+    samples: completeCatalog('imdb', imdbSamples),
   },
   {
     id: 'spotify',
@@ -141,7 +147,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1 MB',
     bestFor: 'Audio metrics, CASE classification, averages',
     filename: './databases/spotify.sqlite',
-    samples: spotifySamples,
+    samples: completeCatalog('spotify', spotifySamples),
   },
   {
     id: 'pokemon',
@@ -150,7 +156,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~500 KB',
     bestFor: 'Filtering, stat sums, type distributions',
     filename: './databases/pokemon.sqlite',
-    samples: pokemonSamples,
+    samples: completeCatalog('pokemon', pokemonSamples),
   },
   {
     id: 'university',
@@ -159,7 +165,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~500 KB',
     bestFor: 'Transcripts, prerequisites, class sizes',
     filename: './databases/university.sqlite',
-    samples: universitySamples,
+    samples: completeCatalog('university', universitySamples),
   },
   {
     id: 'premier_league',
@@ -168,7 +174,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1 MB',
     bestFor: 'Standings calculation, CTEs, home/away points',
     filename: './databases/premier_league.sqlite',
-    samples: premierLeagueSamples,
+    samples: completeCatalog('premier_league', premierLeagueSamples),
   },
   {
     id: 'ecommerce',
@@ -177,7 +183,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1.5 MB',
     bestFor: 'Commercial metrics, reviews, seller ratings',
     filename: './databases/ecommerce.sqlite',
-    samples: ecommerceSamples,
+    samples: completeCatalog('ecommerce', ecommerceSamples),
   },
   {
     id: 'github',
@@ -186,7 +192,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1 MB',
     bestFor: 'Developer metrics, PR reviews, commit stats',
     filename: './databases/github.sqlite',
-    samples: githubSamples,
+    samples: completeCatalog('github', githubSamples),
   },
   {
     id: 'flights',
@@ -195,7 +201,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1.5 MB',
     bestFor: 'Delay metrics, route pairs, time calculations',
     filename: './databases/flights.sqlite',
-    samples: flightsSamples,
+    samples: completeCatalog('flights', flightsSamples),
   },
   {
     id: 'hospital',
@@ -204,7 +210,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1 MB',
     bestFor: 'Healthcare analytics, bed occupancy, pharmacy costs',
     filename: './databases/hospital.sqlite',
-    samples: hospitalSamples,
+    samples: completeCatalog('hospital', hospitalSamples),
   },
   {
     id: 'real_estate',
@@ -213,7 +219,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1 MB',
     bestFor: 'Price per sqft, agent commissions, neighborhood stats',
     filename: './databases/real_estate.sqlite',
-    samples: realEstateSamples,
+    samples: completeCatalog('real_estate', realEstateSamples),
   },
   {
     id: 'stocks',
@@ -222,7 +228,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1 MB',
     bestFor: 'Financial math, unrealized gains, market caps',
     filename: './databases/stocks.sqlite',
-    samples: stocksSamples,
+    samples: completeCatalog('stocks', stocksSamples),
   },
   {
     id: 'food_delivery',
@@ -231,7 +237,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1.5 MB',
     bestFor: 'Delivery metrics, courier earnings, cuisine sales',
     filename: './databases/food_delivery.sqlite',
-    samples: foodDeliverySamples,
+    samples: completeCatalog('food_delivery', foodDeliverySamples),
   },
   {
     id: 'library',
@@ -240,7 +246,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~500 KB',
     bestFor: 'Active checkouts, genre analytics, fine balances',
     filename: './databases/library.sqlite',
-    samples: librarySamples,
+    samples: completeCatalog('library', librarySamples),
   },
   {
     id: 'gaming',
@@ -249,7 +255,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1 MB',
     bestFor: 'K/D ratios, win rates, weapon stats, rankings',
     filename: './databases/gaming.sqlite',
-    samples: gamingSamples,
+    samples: completeCatalog('gaming', gamingSamples),
   },
   {
     id: 'crypto',
@@ -258,7 +264,7 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1 MB',
     bestFor: 'Wallet valuations, transaction volume, gas summaries',
     filename: './databases/crypto.sqlite',
-    samples: cryptoSamples,
+    samples: completeCatalog('crypto', cryptoSamples),
   },
   {
     id: 'hotels',
@@ -267,6 +273,6 @@ export const bundledDatabases: BundledDatabase[] = [
     size: '~1 MB',
     bestFor: 'Occupancy rates, guest lifetime value, city revenue',
     filename: './databases/hotels.sqlite',
-    samples: hotelsSamples,
+    samples: completeCatalog('hotels', hotelsSamples),
   },
 ];

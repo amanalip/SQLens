@@ -1,5 +1,5 @@
 import { SampleQuery } from '../types';
-import { sample, profileSamples } from './helpers';
+import { sample } from './helpers';
 
 export const employeesExpansion: SampleQuery[] = [
   sample('employees-11', 'Current Department Roster', 'Lists each employee with the department on their latest assignment.', `WITH ranked_assignments AS (

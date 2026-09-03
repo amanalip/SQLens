@@ -1,5 +1,5 @@
 import { SampleQuery } from '../types';
-import { sample, profileSamples } from './helpers';
+import { sample } from './helpers';
 
 export const sakilaExpansion: SampleQuery[] = [
   sample('sakila-11', 'Rentals Still Outstanding', 'Lists films that have been rented but not returned.', `SELECT r.rental_id, f.title, c.first_name || ' ' || c.last_name AS customer, r.rental_date
