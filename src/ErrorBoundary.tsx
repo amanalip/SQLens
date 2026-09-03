@@ -83,6 +83,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 localStorage.removeItem('sqlens_theme');
                 localStorage.removeItem('sqlens_editor_width');
                 localStorage.removeItem('sqlens_results_height');
+                localStorage.removeItem('sqlens_editor_wrap');
                 window.location.reload();
               }}
               style={{
