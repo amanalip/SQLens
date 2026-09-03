@@ -10,6 +10,13 @@ describe('Database Catalog & Sample Queries Verification', () => {
     expect(bundledDatabases.length).toBe(23);
     bundledDatabases.forEach((db) => {
       expect(db.samples.length).toBe(20);
+      expect(new Set(db.samples.map((sample) => sample.id)).size).toBe(20);
+      expect(new Set(db.samples.map((sample) => sample.name)).size).toBe(20);
+      db.samples.forEach((sample) => {
+        expect(sample.name.trim()).not.toBe('');
+        expect(sample.description.trim()).not.toBe('');
+        expect(sample.sql.trim()).not.toBe('');
+      });
     });
   });
 
